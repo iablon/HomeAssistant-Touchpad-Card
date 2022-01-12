@@ -1,4 +1,4 @@
-class ContentCardExample extends HTMLElement {
+class touchpad extends HTMLElement {
   // Whenever the state changes, a new `hass` object is set. Use this to
   // update your content.
   set hass(hass) {
@@ -6,10 +6,10 @@ class ContentCardExample extends HTMLElement {
     if (!this.content) {
       this.innerHTML = `
         <ha-card header="Example-card">
-          <div class="card-content"></div>
+          <div id="externaldiv" class="card-content"></div>
         </ha-card>
       `;
-      this.content = this.querySelector('div');
+      this.content = this.querySelector('externaldiv');
     }
 
     const entityId = this.config.entity;
@@ -18,8 +18,6 @@ class ContentCardExample extends HTMLElement {
 
     this.content.innerHTML = `
       The state of ${entityId} is ${stateStr}!
-      <br><br>
-      <img src="http://via.placeholder.com/350x150">
     `;
   }
 
@@ -39,4 +37,4 @@ class ContentCardExample extends HTMLElement {
   }
 }
 
-customElements.define('content-card-example', ContentCardExample);
+customElements.define('touchpad-card', touchpad);
