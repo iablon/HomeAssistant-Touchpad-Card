@@ -1,4 +1,4 @@
-
+Work in progress 
 # Touchpad Card for Homeassistant
 Finally you can control your tv from your phone without watching what you have done worng.
 # Freatures:
