@@ -1,6 +1,6 @@
 Work in progress 
 # Touchpad Card for Homeassistant
-Finally you can control your tv from your phone without watching.
+Finally you can control your tv from your phone easily.
 # Freatures:
   - Directionl commands;
   - Click, doubleclick and hold;
