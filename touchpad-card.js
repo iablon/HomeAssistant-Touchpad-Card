@@ -14,7 +14,6 @@ class touch extends HTMLElement {
   set hass(hass) {
     
     const entityId = this.config.entity;
-    const speaker = this.config.speaker;
     const state = hass.states[entityId];
     const vol_state = state.attributes.is_volume_muted;
     const icon = state.attributes.icon;
@@ -49,21 +48,21 @@ class touch extends HTMLElement {
     const chpBtn = document.createElement('button');
     chpBtn.className = 'chp';
     chpBtn.innerHTML = '<ha-icon icon="mdi:server-plus"></ha-icon>';
-    chpBtn.addEventListener('click',event =>{Fchp(event,hass,speaker)});
+    chpBtn.addEventListener('click',event =>{Fchp(event,hass,entityId)});
         //channel + or speaker vol + insertion
     controlButtons.appendChild(chpBtn);
         //channel - or speaker vol -
     const chmBtn = document.createElement('button');
     chmBtn.className = 'chm';
     chmBtn.innerHTML = '<ha-icon icon="mdi:server-minus"></ha-icon>';
-    chmBtn.addEventListener('click',event =>{Fchm(event,hass,speaker)});
+    chmBtn.addEventListener('click',event =>{Fchm(event,hass,entityId)});
         //channel - or speaker vol - insertion
     controlButtons.appendChild(chmBtn);
         //src or other something
     const srcBtn = document.createElement('button');
     srcBtn.className = 'src';
     srcBtn.innerHTML = '<ha-icon icon="mdi:speaker-bluetooth"></ha-icon>';
-    srcBtn.addEventListener('click', event =>{Fsrc(event,hass,speaker)});
+    srcBtn.addEventListener('click', event =>{Fsrc(event,hass,entityId)});
         //src or other something insertion 
     controlButtons.appendChild(srcBtn);
         //mute 
