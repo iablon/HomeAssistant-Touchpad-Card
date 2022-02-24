@@ -1,4 +1,13 @@
-import {fireEvent} from './local/fireEvent';
+var fireEvent = function (node, type, detail, options) {
+  options = options || {};
+  detail = detail === null || detail === undefined ? {} : detail;
+  var event = new Event(type, {
+      bubbles: false
+  });
+  event.detail = detail;
+  node.dispatchEvent(event);
+  return event;
+};
 class touch extends HTMLElement {
 
 
@@ -7,11 +16,13 @@ class touch extends HTMLElement {
     const entityId = this.config.entity;
     const speaker = this.config.speaker;
     const state = hass.states[entityId];
+    const vol_state = state.attributes.is_volume_muted;
     const icon = state.attributes.icon;
     const name = state.attributes.friendly_name;
+    console.log(window.innerHeight);
+    console.log(window.innerWidth);
     
-
-    if(!document.querySelector('ha-card')){
+    if(typeof(document.querySelector('ha-card')) === 'undefined' || document.querySelector('ha-card') === null){
       //load css
     this.innerHTML = `<head><link rel="stylesheet" href="/local/style.css"></head>`;
       //card creation
@@ -59,7 +70,7 @@ class touch extends HTMLElement {
     const muteBtn = document.createElement('button');
     muteBtn.className = 'mute';
     muteBtn.innerHTML = '<ha-icon icon="mdi:volume-variant-off"></ha-icon>';
-    muteBtn.addEventListener('click', event =>{Fmute(event,hass,speaker)});
+    muteBtn.addEventListener('click', event =>{Fmute(event,hass,entityId,vol_state)});
         //mute insertion 
     controlButtons.appendChild(muteBtn);
         //volume plus
@@ -156,10 +167,10 @@ function Fsrc(event,ha,ent){
   event.stopImmediatePropagation();
   ha.callService("homeassistant","toggle",{entity_id: ent});
 }
-function Fmute(event,ha,ent){
+function Fmute(event,ha,ent,vol_state){
   fireEvent(window,'haptic','light');
   event.stopImmediatePropagation();
-  ha.callService("remote","send_command",{device: 'fenda',command: 'mute'},{entity_id: 'remote.bob_remote'});
+  ha.callService("media_player","volume_mute",{is_volume_muted: !vol_state},{entity_id: ent});
 }
 function Fvolp(event,ha,ent){
   fireEvent(window,'haptic','light');
@@ -177,14 +188,14 @@ function handleClicks(a,ha,ent){
     
     ha.callService("media_player","play_media",{media_content_id: "KEY_HOME", media_content_type: "send_key"},{entity_id: ent});
     fireEvent(window,'haptic','heavy');
-
+    
   }
   if(a === 1 ){
     
     //click
     
     ha.callService("media_player","play_media",{media_content_id: "KEY_ENTER", media_content_type: "send_key"},{entity_id: ent});
-    fireEvent(window,'haptic','selection');
+    fireEvent(window,'haptic','light');
   }
   if(a === 2){
     //double click
@@ -218,23 +229,23 @@ function touchMove(event,ha,ent) {
     if (diffX > 0) {
       // swiped left
       ha.callService("media_player","play_media",{media_content_id: "KEY_LEFT", media_content_type: "send_key"},{entity_id: ent});
-      fireEvent(window,'haptic','light');
+      fireEvent(window,'haptic','selection');
     } else {
       // swiped right
       ha.callService("media_player","play_media",{media_content_id: "KEY_RIGHT", media_content_type: "send_key"},{entity_id: ent});
-      fireEvent(window,'haptic','light');
+      fireEvent(window,'haptic','selection');
     }  
   } else {
     // sliding vertically
     if (diffY > 0) {
       // swiped up
       ha.callService("media_player","play_media",{media_content_id: "KEY_UP", media_content_type: "send_key"},{entity_id: ent});
-      fireEvent(window,'haptic','light');
+      fireEvent(window,'haptic','selection');
     } else {
       // swiped down
       
       ha.callService("media_player","play_media",{media_content_id: "KEY_DOWN", media_content_type: "send_key"},{entity_id: ent});
-      fireEvent(window,'haptic','light');
+      fireEvent(window,'haptic','selection');
     }  
   }
   initialX = null;
