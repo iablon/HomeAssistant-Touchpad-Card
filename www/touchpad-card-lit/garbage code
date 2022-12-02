@@ -1,0 +1,34 @@
+  clickHandler(action,ha = this.hass){
+    switch (action) {
+        case 'power':
+            ha.callService(m.domain,m.service,m.ent);
+            break;
+        case 'chp':
+            ha.callService("media_player","volume_up",{entity_id: this.config.entity});
+            break;
+        case 'chm':
+            ha.callService("media_player","volume_down",{entity_id: this.config.entity})
+            break;
+        case 'src':
+            ha.callService("media_player","toggle",{entity_id: 'media_player.fenda'});
+            break;
+        case 'mute':
+            ha.callService("media_player","volume_mute",{is_volume_muted: !ha.states[this.config.entity].attributes.is_volume_muted},{entity_id: this.config.entity});
+            break;
+        case 'volp':
+            ha.callService("media_player","volume_up",{entity_id: this.config.entity});
+            break;
+        case 'volm':
+            //ha.callService("media_player","volume_down",{entity_id: this.config.entity});
+            break;
+        case 'touch-area':
+          console.log('fffff');
+            if(e.type === 'click')
+              ha.callService("media_player","play_media",{media_content_id: "KEY_ENTER", media_content_type: "send_key"},{entity_id: this.config.entity});
+            else if(e.type === 'dblclick')
+              ha.callService("media_player","play_media",{media_content_id: "KEY_RETURN", media_content_type: "send_key"},{entity_id: this.config.entity});
+            else if(hold) 
+              ha.callService("media_player","play_media",{media_content_id: "KEY_HOME", media_content_type: "send_key"},{entity_id: this.config.entity});
+            break;
+    }
+  }
