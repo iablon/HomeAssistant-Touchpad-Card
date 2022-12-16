@@ -1,8 +1,11 @@
 import { html, LitElement,css } from 'https://cdn.jsdelivr.net/gh/lit/dist@2/core/lit-core.min.js';
 
 const vibrate = new Event('haptic', {bubbles: false});
+const moreInfo = new Event('hass-more-info', { composed: true });
+
 var clickTimer,holdTimer,holdInterval,falseCheck = false;
 
+let bool=false;
 const buttons = [
   {txt: 'power',icon: 'mdi:power',class: 'power',call_data: {domain: 'homeassistant',service: 'toggle'}},
   {txt: 'chup',repeatOnHold: true,icon: 'mdi:arrow-up-bold-circle',class: 'ch-plus',call_data: {domain: 'media_player',service: 'play_media'},key_data: {media_content_id: 'KEY_CHUP', media_content_type: 'send_key'}},
@@ -25,7 +28,7 @@ class MyElement extends LitElement {
   render() {
     return html`
             <the-tv class="${this.config.fancy_borders ? 'fancy-borders' : ''}" style="height:${window.navigator.userAgent.includes("Home Assistant") ? '100vh' : window.navigator.brave != undefined ? '80vh' : '85vh' };">
-              <div id="entity-area" >
+              <div id="entity-area" @dblclick="${()=>this.moreInfoAction(this)}">
                 ${this.tvIconOrSource()}
                 <b>${ this.config.name != undefined ? this.config.name : this.hass.states[this.config.entity].attributes.friendly_name.toUpperCase()}</b>
                 ${this.makeMeButton(0)}
@@ -200,6 +203,10 @@ class MyElement extends LitElement {
         `;
 }
 
+static getConfigElement() {
+  return document.createElement("content-card-editor");
+}
+
 tvIconOrSource(ha = this.hass){
   if(ha.states[this.config.entity].attributes.entity_picture != undefined)
     return html`<img src="${this.hass.states[this.config.entity].attributes.entity_picture}" style="margin-left:30px;">
@@ -219,7 +226,7 @@ buttonsContainer(){
 }
 
 
-makeMeButton (i){
+makeMeButton (i,ha = this.hass){
   if(i==7){
     let touchpad = document.createElement('button');
     touchpad.classList.add(buttons[i].class);
@@ -237,7 +244,7 @@ makeMeButton (i){
 
     touchpad.addEventListener('dblclick',e => {
       e.stopImmediatePropagation(); 
-      this.feedback('light'); 
+      this.feedback('success'); 
       falseCheck = false; 
       clearTimeout(clickTimer); 
       clickTimer = null; 
@@ -247,7 +254,7 @@ makeMeButton (i){
       e.stopImmediatePropagation();  
       this.touchStart(e); 
       holdTimer = setTimeout(() => { 
-        this.feedback('light'); 
+        this.feedback('medium'); 
         console.log('hold '+buttons[i].txt);
       }, 700);
     });
@@ -292,7 +299,7 @@ else {
         if(buttons[i].repeatOnHold) 
           holdInterval = setInterval(() => { 
             console.log('ripeto '+buttons[i].txt); 
-            this.feedback('light')
+            this.feedback('selection')
           }, 450); 
         }, 600);
       });
@@ -302,7 +309,7 @@ else {
       falseCheck = false; 
       clearTimeout(clickTimer); 
       clickTimer = null; 
-      this.feedback('light');  
+      this.feedback('success');  
       console.log('dbclick '+buttons[i].txt); 
     });
 
@@ -316,18 +323,18 @@ else {
 }
 }
 
+moreInfoAction(node){
+  moreInfo.detail = {entityId: this.config.entity};
+  node.dispatchEvent(moreInfo);
+}
 feedback(type){
   vibrate.detail = type;
   window.dispatchEvent(vibrate)
 }
-
-
-
 touchStart(e){
   window.initialX = e.touches[0].clientX;
   window.initialY = e.touches[0].clientY;
 }
-
 touchMove(e,ha = this.hass) {
   if( ! initialX || ! initialY){
     return;
@@ -365,12 +372,65 @@ touchMove(e,ha = this.hass) {
   initialX = null;
   initialY = null;
 }
-
-  setConfig(config) {
+setConfig(config) {
+  if(!config.entity)
+    throw new Error('You need to define an entity');
     this.config = config;
 }
 }
 
+
+class ContentCardEditor extends LitElement {
+
+  static get properties() {
+    return {
+      hass: {},
+      _config: {},
+    };
+  }
+
+  setConfig(config) {
+    this._config = config;
+  }
+
+    render(){
+      return html`
+          <ha-select id="entity-selector" naturalMenuWidth fixedMenuPosition label="Entità" @selected="${this.updateIt}" @closed="${ev => ev.stopPropagation()}"  >
+          ${Object.keys(this.hass.states).filter(ent => ent.match('media_player[.]')).map(entity => {
+                            return html` <mwc-list-item .value="${entity}">${entity}</mwc-list-item> `;
+                        })}
+          </ha-select><br>
+          <ha-formfield class="switch-wrapper"  label="Fancy Borders">
+          <ha-switch id="fancy-borders-selector" .checked="${this._config.fancy_borders}" @change="${this.updateIt}"></ha-switch>
+        </ha-formfield>
+      `;
+    }  
+
+  updateIt(e,ha = this.hass){
+    if(e.target.id === 'entity-selector'){
+      bool = true;
+      this._config.entity = Object.keys(ha.states).filter(ent => ent.match('media_player[.]'))[e.detail.index] ;
+    }
+    if(e.target.id === 'fancy-borders-selector' )
+      this._config.fancy_borders = !this._config.fancy_borders ;
+    const event = new Event("config-changed", {
+      bubbles: true,
+      composed: true
+    });
+    event.detail = {config: this._config};
+    this.dispatchEvent(event); 
+  }
+
+  static get styles(){
+    return css`
+      * {
+        padding: 0.5rem;
+      }
+    `;
+  }
+}
+
+customElements.define("content-card-editor", ContentCardEditor);
 
 customElements.define('my-tv-card', MyElement);
 window.customCards = window.customCards || [];
