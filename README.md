@@ -1,4 +1,4 @@
-
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/hackerino)
 
 # Touchpad Card for Homeassistant for samsung tv
 With this card you can control your samsung smart tv(using the [Ollo's SamsungTV Smart Integration](https://github.com/ollo69/ha-samsungtv-smart)) like with your normal physical remote.
