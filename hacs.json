@@ -1,5 +1,6 @@
 {
   "name": "Samsung smart tv remote with touchpad and more",
   "content_in_root": false,
-  "homeassistant": "2022.11.0"
+  "render_readme": true,
+  "content_in_root": true
 }
