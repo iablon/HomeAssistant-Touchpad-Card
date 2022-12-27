@@ -38,7 +38,7 @@
  
    static get styles() {
      return i$1`
- 
+
          img{
              background-size: contain;
              border-radius: 15px;
