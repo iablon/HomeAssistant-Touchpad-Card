@@ -24,7 +24,7 @@ With this card you can control your samsung smart tv(using the [Ollo's SamsungTV
 
 ## Editor sample view:
 
-![Schermata del 2022-12-27 16-55-41](https://user-images.githubusercontent.com/64681499/209690608-73ee6891-0a43-45ee-9e27-8702d0984f19.png)
-![Schermata del 2022-12-27 16-55-50](https://user-images.githubusercontent.com/64681499/209690607-080cb7e9-0e12-4bda-b3e3-c944be3f0145.png)
+![Schermata del 2022-12-27 20-48-19](https://user-images.githubusercontent.com/64681499/209715652-30c9e296-302f-4218-a51a-57ccfeea1f74.png)
+![Schermata del 2022-12-27 20-48-26](https://user-images.githubusercontent.com/64681499/209715649-1e9b608e-66c0-4c1a-a533-ea420af836e4.png)
 
 
