@@ -2,5 +2,6 @@
   "name": "Samsung smart tv remote with touchpad and more",
   "content_in_root": false,
   "render_readme": true,
+  "filename": "touchpad-card.js",
   "content_in_root": true
 }
