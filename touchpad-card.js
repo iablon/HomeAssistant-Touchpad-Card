@@ -721,6 +721,9 @@
    }
    static get styles(){
      return i$1`
+       #entity-selector{
+        width: 100%;
+       }
        .content > *{
          padding:0;
          width:100%;
