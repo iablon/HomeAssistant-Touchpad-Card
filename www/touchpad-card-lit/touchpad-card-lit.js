@@ -570,13 +570,13 @@ class ContentCardEditor extends LitElement {
 
   iconConfig(a){
     return html`
-          <ha-icon-picker id="icon-selector" label="${a === 'topicon' ? 'Entity' : a} button icon" @opened-changed="${this.updateIt}" @value-changed="${this.updateIt}" .value="${a.includes('-') ? this._config.icons[a.replace('-','_')] : this._config.icons[a]}" ></ha-icon-picker>
+          <ha-icon-picker id="icon-selector" label="${a === 'topicon' ? 'Entity' : a+' button'} icon" @opened-changed="${this.updateIt}" @value-changed="${this.updateIt}" .value="${a.includes('-') ? this._config.icons[a.replace('-','_')] : this._config.icons[a]}" ></ha-icon-picker>
         `;
   } 
 
   dblclickConfig(a){
     return html`
-    <ha-select id="dblclick-service-selector"  .value="${ this._config.options[a].dblclick }" label="Script to invoke on double click" @selected="${this.updateIt }" @closed="${ev => ev.stopPropagation()}"  >
+    <ha-select id="dblclick-service-selector"  .value="${ this._config.options[a].dblclick }" label="Script/Automation to invoke on double click" @selected="${this.updateIt }" @closed="${ev => ev.stopPropagation()}"  >
       <mwc-list-item .value="${'no-action'}">None</mwc-list-item>
       ${Object.keys(this.hass.states).filter(ent => ent.match(/automation|script/)).map(action => {
                             return html` <mwc-list-item .value="${action}">${action}</mwc-list-item> `;
@@ -585,7 +585,7 @@ class ContentCardEditor extends LitElement {
   }
   holdConfig(a){
     return html`
-    <ha-select id="hold-service-selector" .value="${ this._config.options[a].hold}" label="Script to invoke on hold" @selected="${ this.updateIt }" @closed="${ev => ev.stopPropagation()}"  >
+    <ha-select id="hold-service-selector" .value="${ this._config.options[a].hold}" label="Script/Automation to invoke on hold" @selected="${ this.updateIt }" @closed="${ev => ev.stopPropagation()}"  >
       <mwc-list-item .value="${'no-action'}">None</mwc-list-item>
       ${Object.keys(this.hass.states).filter(ent => ent.match(/automation|script/)).map(action => {
                         return html` <mwc-list-item .value="${action}">${action}</mwc-list-item> `;
