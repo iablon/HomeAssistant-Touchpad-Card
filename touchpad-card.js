@@ -494,7 +494,7 @@
    constructor (){
      super();
      this.updateIt();
-     this.tabs = {power: false,source: false,mute:false,touchpad: false,otherIcon: false,settings:true,icon: false,dblclick: false,hold: false,volume: false,channel: false};
+     this.tabs = {power: false,source: false,mute:false,otherIcon: false,settings:true,icon: false,dblclick: false,hold: false,volume: false,channel: false};
      this.targ = '';
    }
  
@@ -526,7 +526,6 @@
              <div class="power tab ${this.tabs.power ? 'selected' : ''}" @click="${this.changeTab}"><ha-icon icon="mdi:power"></ha-icon></div>
              <div class="source tab ${this.tabs.source ? 'selected' : ''}" @click="${this.changeTab}"><ha-icon icon="mdi:logout-variant"></ha-icon></div>
              <div class="mute tab ${this.tabs.mute ? 'selected' : ''}" @click="${this.changeTab}"><ha-icon icon="mdi:volume-mute"></ha-icon></div>
-             <div class="touchpad tab ${this.tabs.touchpad ? 'selected' : ''}" @click="${this.changeTab}"><ha-icon icon="mdi:trackpad"></ha-icon></div>
              <div class="otherIcon tab ${this.tabs.otherIcon ? 'selected' : ''}" @click="${this.changeTab}"><ha-icon icon="mdi:plus-minus-variant"></ha-icon></div>
              <div class="settings tab ${this.tabs.settings ? 'selected' : ''}" @click="${this.changeTab}"><ha-icon icon="mdi:tune"></ha-icon></div>
            </div>
@@ -542,7 +541,7 @@
            <div class="sub-tabs-row ${this.tabs.settings ? 'hide' : 'show'}" >
              <div class="dblclick tab ${this.tabs.dblclick ? 'sub-selected' : ''}" @click="${this.changeTab}">Double click</div>
              <div class="hold tab ${this.tabs.hold ? 'sub-selected' : ''}" @click="${this.changeTab}">Hold</div>
-             <div style="display:${Object.keys(this.tabs).filter(e => this.tabs[e] === true)[0] === 'touchpad' ? 'none' : 'inline-block'};" class="icon tab ${this.tabs.icon ? 'sub-selected' : ''}" @click="${this.changeTab}">Icon</div>
+             <div class="icon tab ${this.tabs.icon ? 'sub-selected' : ''}" @click="${this.changeTab}">Icon</div>
            </div>
            <div class="content">
              ${this.putUpConfig()}
@@ -655,7 +654,7 @@
          power: {dblclick: 'no-action',hold: 'no-action'},
          source: {dblclick: 'no-action',hold: 'no-action'},
          mute: {dblclick: 'no-action',hold: 'no-action'},
-         touchpad: {dblclick: 'no-action',hold: 'no-action'}
+         
        };
      }
      if(this._config.hasOwnProperty('icons')){
