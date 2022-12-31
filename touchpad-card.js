@@ -628,7 +628,7 @@
    changeTab(e){
        if(e.currentTarget.classList[0].match(/^(dblclick|hold|icon|volume|channel)$/))
          Object.keys(this.tabs).filter(val => val.match(/^(dblclick|hold|icon|volume|channel)$/)).forEach(va => this.tabs[va] = false);
-       else if (e.currentTarget.classList[0].match(/^(power|mute|source|touchpad|otherIcon|settings)$/)){
+       else if (e.currentTarget.classList[0].match(/^(power|mute|source|otherIcon|settings)$/)){
          Object.keys(this.tabs).forEach(e => this.tabs[e] = false);
          if(e.currentTarget.classList[0] != 'settings' )
            if(e.currentTarget.classList[0] === 'otherIcon')
