@@ -38,7 +38,6 @@
  
    static get styles() {
      return i$1`
-
          img{
              background-size: contain;
              border-radius: 15px;
@@ -48,11 +47,12 @@
              margin: 20px 0px 20px 20px;
              float: left;
          }
-         ha-icon{
+         ha-icon {
              pointer-events: none;
              touch-action: none;
          }
          #entity-area > ha-icon {
+           color: white;
            float:left;
            margin:17px 0px 0px 20px;
            --mdc-icon-size: 45px ;
@@ -63,7 +63,7 @@
              margin: 9vh auto 0px;
              border-radius: 30px;
              margin-bottom: 10px;
-             height: 59vh; 
+             height: 55%; 
              background: #6d767e;
              border: 1px solid black;
              touch-action:none;
@@ -77,7 +77,6 @@
          the-tv { 
              position: relative;
              background-color: #343a40; 
-             height: 100vh;
              overflow: hidden;
              display: flex;
              flex-flow: column;
@@ -94,23 +93,30 @@
            background-origin: border-box;
            background-clip: padding-box, border-box;
          }
+
  
          #buttons{
-           
+             color: white;
              display: grid;
              grid-template-columns: auto auto auto; 
              grid-template-rows: auto auto; 
              gap: 0px auto; 
-             width: 100%;
+             width: 96%;
              margin: 8vh 0 2vh ;
-             height: 55vh;
+             height: 58%;
              --mdc-icon-size: 30px;
-             max-width: 96%;
              padding-left: 13px;
              padding-right: 13px;
              grid-template-areas: 
                  "a b c"
                  "d e f";
+         }
+         #buttons  button {
+           border: 2px;
+           border-top: solid grey  ;
+           border-left: solid grey;
+           border-bottom: solid black;
+           border-right: solid black;
          }
          b {
              margin: 30px auto auto 20px; 
@@ -119,6 +125,11 @@
              text-shadow: rgba(0, 0, 0, 0.2) 3px 3px 0px; 
          }
          .power{
+             border: 2px;
+             border-top: solid grey  ;
+             border-left: solid grey;
+             border-bottom: solid black;
+             border-right: solid black;
              background-color: transparent; 
              box-shadow: none;
              border-radius: 3rem;
@@ -200,7 +211,7 @@
  }
  
  static getConfigElement() {
-   return document.createElement("content-card-editor");
+   return document.createElement("contentino-card-editor");
  }
  
  constructor(){
@@ -212,7 +223,8 @@
    this.t = Object.keys(this.config.icons).slice(2);
    return y`
      <the-tv class="${this.config.fancy_borders ? 'fancy-borders' : ''}" 
-     style=" ${document.body.querySelector('home-assistant').shadowRoot.querySelector('home-assistant-main').shadowRoot.querySelector('app-drawer-layout').querySelector('partial-panel-resolver').querySelector('ha-panel-lovelace').shadowRoot.querySelector('hui-root').shadowRoot.querySelector('ha-app-layout').className === '' ? 'touch-action: none;' : ''} height:${window.navigator.userAgent.includes("Home Assistant") ? '100vh' : window.navigator.brave != undefined ? '80vh' : '85vh' };">
+     style=" ${document.body.querySelector('home-assistant').shadowRoot.querySelector('home-assistant-main').shadowRoot.querySelector('app-drawer-layout').querySelector('partial-panel-resolver').querySelector('ha-panel-lovelace').shadowRoot.querySelector('hui-root').shadowRoot.querySelector('ha-app-layout').className === '' ? 'touch-action: none;' : ''} 
+            height:${window.navigator.userAgent.includes("Home Assistant") ? '92vh' : window.navigator.brave != undefined ? '80vh' : '82vh' };">
        <div id="entity-area" @dblclick="${()=>this.moreInfoAction(this)}">
          ${this.tvIconOrSource()}
          <b >${ this.config.name }</b>
@@ -791,7 +803,7 @@
    }
  }
  
- customElements.define("content-card-editor", ContentCardEditor);
+ customElements.define("contentino-card-editor", ContentCardEditor);
  
  customElements.define('my-tv-card', MyElement);
  window.customCards = window.customCards || [];
