@@ -121,6 +121,7 @@
          }
          b {
              margin: 30px auto auto 20px; 
+             color: white;
              display: inline-block; 
              font-size: 23px; 
              text-shadow: rgba(0, 0, 0, 0.2) 3px 3px 0px; 
