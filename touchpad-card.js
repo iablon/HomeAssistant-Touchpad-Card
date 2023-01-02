@@ -113,7 +113,7 @@
          }
          #buttons  button {
            color: white;
-           border: 1px;
+           border: 0.5px;
            border-top: solid grey  ;
            border-left: solid grey;
            border-bottom: solid black;
