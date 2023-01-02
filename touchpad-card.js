@@ -112,6 +112,7 @@
                  "d e f";
          }
          #buttons  button {
+           color: white;
            border: 2px;
            border-top: solid grey  ;
            border-left: solid grey;
