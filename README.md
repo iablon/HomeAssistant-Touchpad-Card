@@ -19,7 +19,7 @@ With this card you can control your samsung smart tv(using the [Ollo's SamsungTV
   - Double click on top part of the card to open more info dialog about the media player entity;
 ## note
   1) You must configure SamsungTV Smart custom component to make the card work(Needed)
-  2) Create a separate view for the card(Recomended)
+  2) Create a separate view for the card, and set it to panel mode(1 card) **(RECOMENDED)**
   3) No need to write any yaml,all settings are available in the ui-editor(:sparkles:)
 
 ## Editor sample view:
