@@ -221,8 +221,7 @@ render() {
   this.t = Object.keys(this.config.icons).slice(2);
   return y`
     <the-tv class="${this.config.fancy_borders ? 'fancy-borders' : ''}" 
-      style=" ${document.body.querySelector('home-assistant').shadowRoot.querySelector('home-assistant-main').shadowRoot.querySelector('app-drawer-layout').querySelector('partial-panel-resolver').querySelector('ha-panel-lovelace').shadowRoot.querySelector('hui-root').shadowRoot.querySelector('ha-app-layout').className === '' ? 'touch-action: none;' : ''} 
-            height:${window.navigator.userAgent.includes("Home Assistant") ? '92vh' : window.navigator.brave != undefined ? '80vh' : '82vh' };">
+      style=" height:${window.navigator.userAgent.includes("Home Assistant") ? '92vh' : window.navigator.brave != undefined ? '80vh' : '82vh' };">
       <div id="entity-area" @dblclick="${()=>this.moreInfoAction(this)}">
         ${this.tvIconOrSource()}
         <b >${ this.config.name }</b>
