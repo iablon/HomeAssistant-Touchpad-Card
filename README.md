@@ -7,7 +7,7 @@ With this card you can control your samsung smart tv(using the [Ollo's SamsungTV
 ![remoteBell-modified](https://user-images.githubusercontent.com/64681499/209690449-d67ce6a3-02cb-477c-9b16-cc3071fe847b.png)
 
 
-# Freatures:
+# Features:
   - Functional touchpad;
   - Customizable doubleclick and hold actions(using ui-editor);
   - Haptic feedback(in the future will prrobably be customizable);
