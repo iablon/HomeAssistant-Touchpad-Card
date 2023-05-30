@@ -24,6 +24,7 @@ var t;const i=window,s$1=i.trustedTypes,e=s$1?s$1.createPolicy("lit-html",{creat
  * SPDX-License-Identifier: BSD-3-Clause
  */var l,o;class s extends d$1{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0;}createRenderRoot(){var t,e;const i=super.createRenderRoot();return null!==(t=(e=this.renderOptions).renderBefore)&&void 0!==t||(e.renderBefore=i.firstChild),i}update(t){const i=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(t),this._$Do=Z(i,this.renderRoot,this.renderOptions);}connectedCallback(){var t;super.connectedCallback(),null===(t=this._$Do)||void 0===t||t.setConnected(!0);}disconnectedCallback(){var t;super.disconnectedCallback(),null===(t=this._$Do)||void 0===t||t.setConnected(!1);}render(){return x}}s.finalized=!0,s._$litElement$=!0,null===(l=globalThis.litElementHydrateSupport)||void 0===l||l.call(globalThis,{LitElement:s});const n=globalThis.litElementPolyfillSupport;null==n||n({LitElement:s});(null!==(o=globalThis.litElementVersions)&&void 0!==o?o:globalThis.litElementVersions=[]).push("3.2.2");
 
+const chgConfig = new Event("config-changed", { bubbles: true, composed: true});
 const vibrate = new Event('haptic', {bubbles: false});
 const moreInfo = new Event('hass-more-info', { composed: true });
 var clickTimer,holdTimer,holdInterval,falseCheck = true;
@@ -595,7 +596,7 @@ class ContentCardEditor extends s {
 
     render(){
       return y`
-          <ha-select id="entity-selector"  .value="${this._config?.entity }"  label="Entità" @selected="${this.updateIt}" @closed="${ev => ev.stopPropagation()}"  >
+          <ha-select id="entity-selector"  .value="${this._config?.entity }"  label="Entity" @selected="${this.updateIt}" @closed="${ev => ev.stopPropagation()}"  >
           ${Object.keys(this.hass.states).filter(ent => ent.match('media_player[.]')).map(entity => {
                             return y` <mwc-list-item .value="${entity}">${entity}</mwc-list-item> `;
                         })}
@@ -870,12 +871,9 @@ class ContentCardEditor extends s {
       if(e?.target.id === 'fancy-borders-selector' )
         this._config.fancy_borders = !this._config.fancy_borders ;
     }
-    const event = new Event("config-changed", {
-      bubbles: true,
-      composed: true
-    });
-    event.detail = {config: this._config};
-    this.dispatchEvent(event); 
+
+    chgConfig.detail = {config: this._config};
+    this.dispatchEvent(chgConfig); 
     this.requestUpdate();
   }
   static get styles(){
