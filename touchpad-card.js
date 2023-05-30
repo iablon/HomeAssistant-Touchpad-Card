@@ -591,7 +591,7 @@ class ContentCardEditor extends s {
   };
 
   setConfig(config) {
-    this._config = config;
+    this._config = {...config};
   }
 
     render(){
