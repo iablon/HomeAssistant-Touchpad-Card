@@ -350,25 +350,25 @@ execute(act){
           this.hass.callService('homeassistant','toggle',{entity_id: this.config.entity});
           break;
         case 'channel_up':
-          this.hass.callService('media_player','play_media',{media_content_id: 'KEY_CHUP',media_content_type: 'send_key'},{entity_id: this.config.entity});
+          this.hass.callService('remote','send_command',{command: 'KEY_CHUP'},{entity_id: this.config.entity.replace("media_player","remote")});
           break;
         case 'channel_down':
-          this.hass.callService('media_player','play_media',{media_content_id: 'KEY_CHDOWN',media_content_type: 'send_key'},{entity_id: this.config.entity});
+          this.hass.callService('remote','send_command',{command: 'KEY_CHDOWN'},{entity_id: this.config.entity.replace("media_player","remote")});
           break;
         case 'volume_up':
-          this.hass.callService('media_player','volume_up',{entity_id: this.config.entity});
+          this.hass.callService('remote','send_command',{command: 'KEY_VOLUP'},{entity_id: this.config.entity.replace("media_player","remote")});
           break;
         case 'volume_down':
-          this.hass.callService('media_player','volume_down',{entity_id: this.config.entity});
+          this.hass.callService('remote','send_command',{command: 'KEY_VOLDOWN'},{entity_id: this.config.entity.replace("media_player","remote")});
           break;
         case 'source':
-          this.hass.callService('media_player','play_media',{media_content_id: 'KEY_SOURCE',media_content_type: 'send_key'},{entity_id: this.config.entity});
+          this.hass.callService('remote','send_command',{command: 'KEY_SOURCE'},{entity_id: this.config.entity.replace("media_player","remote")});
           break;
         case 'mute':
-          this.hass.callService('media_player','volume_mute',{is_volume_muted: !this.hass.states[this.config.entity].attributes.is_volume_muted},{entity_id: this.config.entity});
+          this.hass.callService('remote','send_command',{command: 'KEY_MUTE'},{entity_id: this.config.entity.replace("media_player","remote")});
           break;
         case 'touchpad':
-          this.hass.callService('media_player','play_media',{media_content_id: 'KEY_ENTER',media_content_type: 'send_key'},{entity_id: this.config.entity});
+          this.hass.callService('remote','send_command',{command: 'KEY_ENTER'},{entity_id: this.config.entity.replace("media_player","remote")});
           break;
       }
       break;
@@ -435,23 +435,23 @@ execute(act){
         }
           break;
         case 'touchpad':
-          this.hass.callService('media_player','play_media',{media_content_id: 'KEY_RETURN',media_content_type: 'send_key'},{entity_id: this.config.entity});
+          this.hass.callService('remote','send_command',{command: 'KEY_RETURN'},{entity_id: this.config.entity.replace("media_player","remote")});
           break;
       }
       break;
     case 'repeat':
       switch (act.src) {
         case 'volume_up':
-          this.hass.callService('media_player','volume_up',{entity_id: this.config.entity});
+          this.hass.callService('remote','send_command',{command: 'KEY_VOLUP'},{entity_id: this.config.entity.replace("media_player","remote")});
           break;
         case 'volume_down':
-          this.hass.callService('media_player','volume_down',{entity_id: this.config.entity});
+          this.hass.callService('remote','send_command',{command: 'KEY_VOLDOWN'},{entity_id: this.config.entity.replace("media_player","remote")});
           break;
         case 'channel_up':
-          this.hass.callService('media_player','play_media',{media_content_id: 'KEY_CHUP',media_content_type: 'send_key'},{entity_id: this.config.entity});
+          this.hass.callService('remote','send_command',{command: 'KEY_CHUP'},{entity_id: this.config.entity.replace("media_player","remote")});
           break;
         case 'channel_down':
-          this.hass.callService('media_player','play_media',{media_content_id: 'KEY_CHDOWN',media_content_type: 'send_key'},{entity_id: this.config.entity});
+          this.hass.callService('remote','send_command',{command: 'KEY_CHDOWN'},{entity_id: this.config.entity.replace("media_player","remote")});
           break;
       }
       break;
@@ -518,7 +518,7 @@ execute(act){
         }
         break;
       case 'touchpad':
-        this.hass.callService('media_player','play_media',{media_content_id: 'KEY_HOME',media_content_type: 'send_key'},{entity_id: this.config.entity});
+          this.hass.callService('remote','send_command',{command: 'KEY_HOME'},{entity_id: this.config.entity.replace("media_player","remote")});
         break;
         }
         break;
@@ -550,15 +550,15 @@ touchMove(e,ha = this.hass) {
 
   if (Math.abs(diffX) > Math.abs(diffY)) {
     if (diffX > 0) {
-      ha.callService("media_player","play_media",{media_content_id: "KEY_LEFT", media_content_type: "send_key"},{entity_id: this.config.entity});
+      ha.callService("remote","send_command",{command: "KEY_LEFT"},{entity_id: this.config.entity.replace("media_player","remote")});
     } else {
-      ha.callService("media_player","play_media",{media_content_id: "KEY_RIGHT", media_content_type: "send_key"},{entity_id: this.config.entity});
+      ha.callService("remote","send_command",{command: "KEY_RIGHT"},{entity_id: this.config.entity.replace("media_player","remote")});
     }  
   } else {
     if (diffY > 0) {
-      ha.callService("media_player","play_media",{media_content_id: "KEY_UP", media_content_type: "send_key"},{entity_id: this.config.entity});
+      ha.callService("remote","send_command",{command: "KEY_UP"},{entity_id: this.config.entity.replace("media_player","remote")});
     } else {
-      ha.callService("media_player","play_media",{media_content_id: "KEY_DOWN", media_content_type: "send_key"},{entity_id: this.config.entity});
+      ha.callService("remote","send_command",{command: "KEY_DOWN"},{entity_id: this.config.entity.replace("media_player","remote")});
     }  
   }
   initialX = null;
