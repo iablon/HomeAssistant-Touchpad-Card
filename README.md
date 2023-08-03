@@ -1,7 +1,7 @@
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/hackerino)  [![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 
 # Touchpad Card for Homeassistant for samsung tv
-With this card you can control your samsung smart tv(using the [Ollo's SamsungTV Smart Integration](https://github.com/ollo69/ha-samsungtv-smart)) like with your normal physical remote.
+With this card you can control your samsung smart tv like with your normal physical remote.
 
 ## Take a look:
 ![remoteBell-modified](https://user-images.githubusercontent.com/64681499/209690449-d67ce6a3-02cb-477c-9b16-cc3071fe847b.png)
@@ -18,9 +18,8 @@ With this card you can control your samsung smart tv(using the [Ollo's SamsungTV
   - The card will change the top icon to the current source image if available;
   - Double click on top part of the card to open more info dialog about the media player entity;
 ## note
-  1) You must configure SamsungTV Smart custom component to make the card work(Needed)
-  2) Create a separate view for the card, and set it to panel mode(1 card) **(RECOMENDED)**
-  3) No need to write any yaml,all settings are available in the ui-editor(:sparkles:)
+  1) Create a separate view for the card, and set it to panel mode(1 card) **(RECOMENDED)**
+  2) No need to write any yaml,all settings are available in the ui-editor(:sparkles:)
 
 ## Editor sample view:
 
