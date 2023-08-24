@@ -64,7 +64,7 @@ class MyElement extends s {
           margin: 9vh auto 0px;
           border-radius: 30px;
           margin-bottom: 10px;
-          height: 55%; 
+          height: 55%;
           background: #6d767e;
           border: 1px solid black;
           touch-action:none;
@@ -74,10 +74,10 @@ class MyElement extends s {
           width: 100%;
           margin : 0;
         }
-        
-        the-tv { 
+
+        the-tv {
           position: relative;
-          background-color: #343a40; 
+          background-color: #343a40;
           overflow: hidden;
           display: flex;
           flex-flow: column;
@@ -96,16 +96,16 @@ class MyElement extends s {
         #buttons{
           color: white;
           display: grid;
-          grid-template-columns: auto auto auto; 
-          grid-template-rows: auto auto; 
-          gap: 0px auto; 
+          grid-template-columns: auto auto auto;
+          grid-template-rows: auto auto;
+          gap: 0px auto;
           width: 96%;
           margin: 8vh 0 2vh ;
           height: 58%;
           --mdc-icon-size: 30px;
           padding-left: 13px;
           padding-right: 13px;
-          grid-template-areas: 
+          grid-template-areas:
               "a b c"
               "d e f";
         }
@@ -118,11 +118,11 @@ class MyElement extends s {
           border-right: solid black;
         }
         b {
-          margin: 30px auto auto 20px; 
+          margin: 30px auto auto 20px;
           color: white;
-          display: inline-block; 
-          font-size: 23px; 
-          text-shadow: rgba(0, 0, 0, 0.2) 3px 3px 0px; 
+          display: inline-block;
+          font-size: 23px;
+          text-shadow: rgba(0, 0, 0, 0.2) 3px 3px 0px;
         }
         .power{
           border: 2px;
@@ -130,7 +130,7 @@ class MyElement extends s {
           border-left: solid grey;
           border-bottom: solid black;
           border-right: solid black;
-          background-color: transparent; 
+          background-color: transparent;
           box-shadow: none;
           border-radius: 3rem;
           float: right;
@@ -218,11 +218,11 @@ constructor(){
   this.t = [];
 }
 
-render() {
+  render() {
   this.t = Object.keys(this.config.icons).slice(2);
   return y`
-    <the-tv class="${this.config.fancy_borders ? 'fancy-borders' : ''}" 
-      style=" height:${window.navigator.userAgent.includes("Home Assistant") ? '92vh' : window.navigator.brave != undefined ? '80vh' : '82vh' };">
+    <the-tv class="${this.config.fancy_borders ? 'fancy-borders' : ''}"
+      style=" height:${window.navigator.userAgent.includes("Home Assistant") ? '91vh' : window.navigator.brave != undefined ? '80vh' : '82vh' };">
       <div id="entity-area" @dblclick="${()=>this.moreInfoAction(this)}">
         ${this.tvIconOrSource()}
         <b >${ this.config.name }</b>
@@ -241,7 +241,7 @@ tvIconOrSource(){
   if(this.hass.states[this.config.entity].attributes.entity_picture != undefined)
     return y`<img src="${this.hass.states[this.config.entity].attributes.entity_picture}" style="margin-left:30px;">
     `;
-  else 
+  else
     return y`<ha-icon icon="${this.config?.icons?.topicon}"></ha-icon>
     `;
 }
@@ -254,23 +254,23 @@ baseButton(cssName){
   let icon = document.createElement('ha-icon');
   icon.setAttribute('icon',this.config.icons[cssName]);
   button.appendChild(icon);
-  button.addEventListener('click', e => { 
-    e.stopImmediatePropagation();  
-    clickTimer = setTimeout(() => { 
-      if(falseCheck){ 
-        this.feedback('light'); 
+  button.addEventListener('click', e => {
+    e.stopImmediatePropagation();
+    clickTimer = setTimeout(() => {
+      if(falseCheck){
+        this.feedback('light');
         this.execute({type: 'click',src: cssName});
-      } 
+      }
       falseCheck=true;
     }, 210);
   });
 
   button.addEventListener('touchstart',e => {
-    e.stopImmediatePropagation(); 
-    holdTimer = setTimeout(() => { 
-      this.feedback('light'); 
-      if(cssName.match(/^(channel_up|channel_down|volume_up|volume_down)$/)) 
-        holdInterval = setInterval(() => { 
+    e.stopImmediatePropagation();
+    holdTimer = setTimeout(() => {
+      this.feedback('light');
+      if(cssName.match(/^(channel_up|channel_down|volume_up|volume_down)$/))
+        holdInterval = setInterval(() => {
           this.execute({type: 'repeat',src: cssName});
           this.feedback('selection');
         }, 450);
@@ -280,17 +280,17 @@ baseButton(cssName){
     });
 
   button.addEventListener('dblclick',e => {
-    e.stopImmediatePropagation(); 
-    falseCheck = false; 
-    clearTimeout(clickTimer); 
-    clickTimer = null; 
+    e.stopImmediatePropagation();
+    falseCheck = false;
+    clearTimeout(clickTimer);
+    clickTimer = null;
     this.execute({type: 'dblclick',src: cssName});
-    this.feedback('success');  
+    this.feedback('success');
   });
 
   button.addEventListener('touchend',e=>{
-    e.stopImmediatePropagation(); 
-    clearInterval(holdInterval); 
+    e.stopImmediatePropagation();
+    clearInterval(holdInterval);
     clearTimeout(clickTimer);
     clearTimeout(holdTimer);
   });
@@ -301,228 +301,117 @@ touchpad (){
     let touchpad = document.createElement('button');
     touchpad.classList.add('touch-area');
 
-    touchpad.addEventListener('click', e => { 
-      e.stopImmediatePropagation();  
-      clickTimer = setTimeout(() => { 
-        if(falseCheck){ 
+    touchpad.addEventListener('click', e => {
+      e.stopImmediatePropagation();
+      clickTimer = setTimeout(() => {
+        if(falseCheck){
           this.execute({type: 'click',src: 'touchpad'});
-          this.feedback('light'); 
-        } 
-        falseCheck=true; 
+          this.feedback('light');
+        }
+        falseCheck=true;
       }, 210);
     });
 
     touchpad.addEventListener('dblclick',e => {
-      e.stopImmediatePropagation(); 
-      this.feedback('success'); 
-      falseCheck = false; 
-      clearTimeout(clickTimer); 
-      clickTimer = null; 
+      e.stopImmediatePropagation();
+      this.feedback('success');
+      falseCheck = false;
+      clearTimeout(clickTimer);
+      clickTimer = null;
       this.execute({type: 'dblclick',src: 'touchpad'});
     });
     touchpad.addEventListener('touchstart' ,e => {
-      e.stopImmediatePropagation();  
-      this.touchStart(e); 
-      holdTimer = setTimeout(() => { 
-        this.feedback('medium'); 
+      e.stopImmediatePropagation();
+      this.touchStart(e);
+      holdTimer = setTimeout(() => {
+        this.feedback('medium');
         this.execute({type: 'hold',src: 'touchpad'});
       }, 700);
     });
 
     touchpad.addEventListener('touchmove',e => {
-      e.stopImmediatePropagation(); 
+      e.stopImmediatePropagation();
       this.touchMove(e);
     });
 
     touchpad.addEventListener('touchend', e => {
-      e.stopImmediatePropagation(); 
-      clearTimeout(clickTimer); 
-      clearTimeout(holdTimer); 
+      e.stopImmediatePropagation();
+      clearTimeout(clickTimer);
+      clearTimeout(holdTimer);
     });
     return touchpad;
   }
 
-execute(act){
-  switch (act.type) {
-    case 'click':
+execute(act) {
+  if (act.type === "click") {
+    if (this.config.options[act.src].click.type === "default") {
       switch (act.src) {
         case 'power':
           this.hass.callService('homeassistant','toggle',{entity_id: this.config.entity});
           break;
         case 'channel_up':
-          this.hass.callService('remote','send_command',{command: 'KEY_CHUP'},{entity_id: this.config.entity.replace("media_player","remote")});
+          this.hass.callService('media_player','play_media',{media_content_id: 'KEY_CHUP',media_content_type: 'send_key'},{entity_id: this.config.entity});
           break;
         case 'channel_down':
-          this.hass.callService('remote','send_command',{command: 'KEY_CHDOWN'},{entity_id: this.config.entity.replace("media_player","remote")});
+          this.hass.callService('media_player','play_media',{media_content_id: 'KEY_CHDOWN',media_content_type: 'send_key'},{entity_id: this.config.entity});
           break;
         case 'volume_up':
-          this.hass.callService('remote','send_command',{command: 'KEY_VOLUP'},{entity_id: this.config.entity.replace("media_player","remote")});
+          this.hass.callService('media_player','volume_up',{entity_id: this.config.entity});
           break;
         case 'volume_down':
-          this.hass.callService('remote','send_command',{command: 'KEY_VOLDOWN'},{entity_id: this.config.entity.replace("media_player","remote")});
+          this.hass.callService('media_player','volume_down',{entity_id: this.config.entity});
           break;
         case 'source':
-          this.hass.callService('remote','send_command',{command: 'KEY_SOURCE'},{entity_id: this.config.entity.replace("media_player","remote")});
+          this.hass.callService('media_player','play_media',{media_content_id: 'KEY_SOURCE',media_content_type: 'send_key'},{entity_id: this.config.entity});
           break;
         case 'mute':
-          this.hass.callService('remote','send_command',{command: 'KEY_MUTE'},{entity_id: this.config.entity.replace("media_player","remote")});
+          this.hass.callService('media_player','volume_mute',{is_volume_muted: !this.hass.states[this.config.entity].attributes.is_volume_muted},{entity_id: this.config.entity});
           break;
         case 'touchpad':
-          this.hass.callService('remote','send_command',{command: 'KEY_ENTER'},{entity_id: this.config.entity.replace("media_player","remote")});
+          this.hass.callService('media_player','play_media',{media_content_id: 'KEY_ENTER',media_content_type: 'send_key'},{entity_id: this.config.entity});
           break;
       }
-      break;
-    case 'dblclick':
-      switch(act.src){
-        case 'power':
-          if(this.config.options.power.dblclick.type  !== 'no-action')
-            switch (this.config.options.power.dblclick.type) {
-              case 'script':
-                this.hass.callService('script', this.config.options.power.dblclick.entity.substring(this.config.options.power.dblclick.entity.indexOf('.')+1));
-                break;
-              case 'automation':
-                this.hass.callService('automation', 'trigger' ,{entity_id: this.config.options.power.dblclick.entity});
-                break;
-              case 'toggle':
-                this.hass.callService('homeassistant', 'toggle', {entity_id: this.config.options.power.dblclick.entity});
-                break;
-              case 'turn-on':
-                this.hass.callService('homeassistant', 'turn_on', {entity_id: this.config.options.power.dblclick.entity});
-                break;
-              case 'turn-off':
-                this.hass.callService('homeassistant', 'turn_off', {entity_id: this.config.options.power.dblclick.entity});
-                break;
-          }
-          break;
-        case 'source':
-          if(this.config.options.source.dblclick.type  !== 'no-action')
-            switch (this.config.options.source.dblclick.type) {
-              case 'script':
-                this.hass.callService('script', this.config.options.source.dblclick.entity.substring(this.config.options.source.dblclick.entity.indexOf('.')+1));
-                break;
-              case 'automation':
-                this.hass.callService('automation', 'trigger' ,{entity_id: this.config.options.source.dblclick.entity});
-                break;
-              case 'toggle':
-                this.hass.callService('homeassistant', 'toggle', {entity_id: this.config.options.source.dblclick.entity});
-                break;
-              case 'turn-on':
-                this.hass.callService('homeassistant', 'turn_on', {entity_id: this.config.options.source.dblclick.entity});
-                break;
-              case 'turn-off':
-                this.hass.callService('homeassistant', 'turn_off', {entity_id: this.config.options.source.dblclick.entity});
-                break;
-        }
-          break;
-        case 'mute':
-          if(this.config.options.mute.dblclick  !== 'no-action')
-          switch (this.config.options.mute.dblclick.type) {
-            case 'script':
-              this.hass.callService('script', this.config.options.mute.dblclick.entity.substring(this.config.options.mute.dblclick.entity.indexOf('.')+1));
-              break;
-            case 'automation':
-              this.hass.callService('automation', 'trigger' ,{entity_id: this.config.options.mute.dblclick.entity});
-              break;
-            case 'toggle':
-              this.hass.callService('homeassistant', 'toggle', {entity_id: this.config.options.mute.dblclick.entity});
-              break;
-            case 'turn-on':
-              this.hass.callService('homeassistant', 'turn_on', {entity_id: this.config.options.mute.dblclick.entity});
-              break;
-            case 'turn-off':
-              this.hass.callService('homeassistant', 'turn_off', {entity_id: this.config.options.mute.dblclick.entity});
-              break;
-        }
-          break;
-        case 'touchpad':
-          this.hass.callService('remote','send_command',{command: 'KEY_RETURN'},{entity_id: this.config.entity.replace("media_player","remote")});
-          break;
-      }
-      break;
-    case 'repeat':
-      switch (act.src) {
-        case 'volume_up':
-          this.hass.callService('remote','send_command',{command: 'KEY_VOLUP'},{entity_id: this.config.entity.replace("media_player","remote")});
-          break;
-        case 'volume_down':
-          this.hass.callService('remote','send_command',{command: 'KEY_VOLDOWN'},{entity_id: this.config.entity.replace("media_player","remote")});
-          break;
-        case 'channel_up':
-          this.hass.callService('remote','send_command',{command: 'KEY_CHUP'},{entity_id: this.config.entity.replace("media_player","remote")});
-          break;
-        case 'channel_down':
-          this.hass.callService('remote','send_command',{command: 'KEY_CHDOWN'},{entity_id: this.config.entity.replace("media_player","remote")});
-          break;
-      }
-      break;
-    case 'hold':
-      switch(act.src){
-      case 'power':
-        if(this.config.options.power.hold.type  !== 'no-action')
-          switch (this.config.options.power.hold.type) {
-            case 'script':
-              this.hass.callService('script', this.config.options.power.hold.entity.substring(this.config.options.power.hold.entity.indexOf('.')+1));
-              break;
-            case 'automation':
-              this.hass.callService('automation', 'trigger' ,{entity_id: this.config.options.power.hold.entity});
-              break;
-            case 'toggle':
-              this.hass.callService('homeassistant', 'toggle', {entity_id: this.config.options.power.hold.entity});
-              break;
-            case 'turn-on':
-              this.hass.callService('homeassistant', 'turn_on', {entity_id: this.config.options.power.hold.entity});
-              break;
-            case 'turn-off':
-              this.hass.callService('homeassistant', 'turn_off', {entity_id: this.config.options.power.hold.entity});
-              break;
-          }
-        break;
-      case 'source':
-        if(this.config.options.source.hold.type !== 'no-action')
-          switch (this.config.options.source.hold.type) {
-            case 'script':
-              this.hass.callService('script', this.config.options.source.hold.entity.substring(this.config.options.source.hold.entity.indexOf('.')+1));
-              break;
-            case 'automation':
-              this.hass.callService('automation', 'trigger' ,{entity_id: this.config.options.source.hold.entity});
-              break;
-            case 'toggle':
-              this.hass.callService('homeassistant', 'toggle', {entity_id: this.config.options.source.hold.entity});
-              break;
-            case 'turn-on':
-              this.hass.callService('homeassistant', 'turn_on', {entity_id: this.config.options.source.hold.entity});
-              break;
-            case 'turn-off':
-              this.hass.callService('homeassistant', 'turn_off', {entity_id: this.config.options.source.hold.entity});
-              break;
-        }
-        break;
-      case 'mute':
-        if(this.config.options.mute.hold.type !== 'no-action')
-          switch (this.config.options.mute.hold.type) {
-            case 'script':
-              this.hass.callService('script', this.config.options.mute.hold.entity.substring(this.config.options.mute.hold.entity.indexOf('.')+1));
-              break;
-            case 'automation':
-              this.hass.callService('automation', 'trigger' ,{entity_id: this.config.options.mute.hold.entity});
-              break;
-            case 'toggle':
-              this.hass.callService('homeassistant', 'toggle', {entity_id: this.config.options.mute.hold.entity});
-              break;
-            case 'turn-on':
-              this.hass.callService('homeassistant', 'turn_on', {entity_id: this.config.options.mute.hold.entity});
-              break;
-            case 'turn-off':
-              this.hass.callService('homeassistant', 'turn_off', {entity_id: this.config.options.mute.hold.entity});
-              break;
-        }
-        break;
-      case 'touchpad':
-          this.hass.callService('remote','send_command',{command: 'KEY_HOME'},{entity_id: this.config.entity.replace("media_player","remote")});
-        break;
-        }
-        break;
     }
+    else {
+      switch (this.config.options[act.src].click.type) {
+        case 'script':
+          this.hass.callService('script', this.config.options[act.src].click.entity.substring(this.config.options[act.src].click.entity.indexOf('.')+1));
+          break;
+        case 'automation':
+          this.hass.callService('automation', 'trigger' ,{entity_id: this.config.options[act.src].click.entity});
+          break;
+        case 'toggle':
+          this.hass.callService('homeassistant', 'toggle', {entity_id: this.config.options[act.src].click.entity});
+          break;
+        case 'turn-on':
+          this.hass.callService('homeassistant', 'turn_on', {entity_id: this.config.options[act.src].click.entity});
+          break;
+        case 'turn-off':
+          this.hass.callService('homeassistant', 'turn_off', {entity_id: this.config.options[act.src].click.entity});
+          break;
+      }
+    }
+  }
+  else if (this.config.options[act.src][act.src].type  !== 'no-action') {
+    switch (this.config.options[act.src][act.src].type) {
+      case 'script':
+        this.hass.callService('script', this.config.options[act.src][act.src].entity.substring(this.config.options[act.src][act.src].entity.indexOf('.')+1));
+        break;
+      case 'automation':
+        this.hass.callService('automation', 'trigger' ,{entity_id: this.config.options[act.src][act.src].entity});
+        break;
+      case 'toggle':
+        this.hass.callService('homeassistant', 'toggle', {entity_id: this.config.options[act.src][act.src].entity});
+        break;
+      case 'turn-on':
+        this.hass.callService('homeassistant', 'turn_on', {entity_id: this.config.options[act.src][act.src].entity});
+        break;
+      case 'turn-off':
+        this.hass.callService('homeassistant', 'turn_off', {entity_id: this.config.options[act.src][act.src].entity});
+        break;
+  }
+  }
+
   }
 
 moreInfoAction(node){
@@ -541,7 +430,7 @@ touchMove(e,ha = this.hass) {
   if( ! initialX || ! initialY){
     return;
   }
-  
+
   var currentX = e.touches[0].clientX;
   var currentY = e.touches[0].clientY;
 
@@ -550,16 +439,16 @@ touchMove(e,ha = this.hass) {
 
   if (Math.abs(diffX) > Math.abs(diffY)) {
     if (diffX > 0) {
-      ha.callService("remote","send_command",{command: "KEY_LEFT"},{entity_id: this.config.entity.replace("media_player","remote")});
+      ha.callService("media_player","play_media",{media_content_id: "KEY_LEFT", media_content_type: "send_key"},{entity_id: this.config.entity});
     } else {
-      ha.callService("remote","send_command",{command: "KEY_RIGHT"},{entity_id: this.config.entity.replace("media_player","remote")});
-    }  
+      ha.callService("media_player","play_media",{media_content_id: "KEY_RIGHT", media_content_type: "send_key"},{entity_id: this.config.entity});
+    }
   } else {
     if (diffY > 0) {
-      ha.callService("remote","send_command",{command: "KEY_UP"},{entity_id: this.config.entity.replace("media_player","remote")});
+      ha.callService("media_player","play_media",{media_content_id: "KEY_UP", media_content_type: "send_key"},{entity_id: this.config.entity});
     } else {
-      ha.callService("remote","send_command",{command: "KEY_DOWN"},{entity_id: this.config.entity.replace("media_player","remote")});
-    }  
+      ha.callService("media_player","play_media",{media_content_id: "KEY_DOWN", media_content_type: "send_key"},{entity_id: this.config.entity});
+    }
   }
   initialX = null;
   initialY = null;
@@ -581,7 +470,7 @@ class ContentCardEditor extends s {
   constructor (){
     super();
     this.updateIt();
-    this.tabs = {power: false,source: false,mute:false,otherIcon: false,settings:true,icon: false,dblclick: false,hold: false,volume: false,channel: false};
+    this.tabs = {power: false,source: false,mute:false,otherIcon: false,settings:true,icon: false,click: false,dblclick: false,hold: false,volume: false,channel: false};
     this.tmpName = '';
   }
 
@@ -591,7 +480,7 @@ class ContentCardEditor extends s {
   };
 
   setConfig(config) {
-    this._config = {...config};
+    this._config = JSON.parse(JSON.stringify(config));
   }
 
     render(){
@@ -603,7 +492,7 @@ class ContentCardEditor extends s {
           </ha-select>
         ${this._config?.entity != undefined ? this.makeMeTabMenu() : null}
       `;
-    }  
+    }
 
     makeMeTabMenu(){
       return y`
@@ -625,6 +514,7 @@ class ContentCardEditor extends s {
   subTabs(){
     let normalCase =  y`
           <div class="sub-tabs-row ${this.tabs.settings ? 'hide' : 'show'}" >
+            <div class="click tab ${this.tabs.click ? 'sub-selected' : ''}" @click="${this.changeTab}">Click</div>
             <div class="dblclick tab ${this.tabs.dblclick ? 'sub-selected' : ''}" @click="${this.changeTab}">Double click</div>
             <div class="hold tab ${this.tabs.hold ? 'sub-selected' : ''}" @click="${this.changeTab}">Hold</div>
             <div class="icon tab ${this.tabs.icon ? 'sub-selected' : ''}" @click="${this.changeTab}">Icon</div>
@@ -652,35 +542,73 @@ class ContentCardEditor extends s {
     if(currSelection[0] === 'settings')
       return this.generalConfig();
     else
-      switch(currSelection[1]){
+      switch (currSelection[1]) {
+        case 'click':
+          return this.clickConfig(currSelection[0]);
         case 'dblclick':
             return this.dblclickConfig(currSelection[0]);
         case 'hold':
             return this.holdConfig(currSelection[0]);
         case 'icon':
-          return this.iconConfig(currSelection[0]); 
+          return this.iconConfig(currSelection[0]);
         case 'volume':
-          return this.doubleIconConfig(currSelection[1]);
+          return this.doubleConfig(currSelection[1]);
         case 'channel':
-          return this.doubleIconConfig(currSelection[1]);
+          return this.doubleConfig(currSelection[1]);
       }
   }
 
-  doubleIconConfig(a){
+
+  doubleConfig(a) {
     return y`
-    ${this.iconConfig(a+'-up')}
-    ${this.iconConfig(a+'-down')}`;
+    ${this.iconConfig(a+'_up',true)}
+    ${this.iconConfig(a + '_down',true)}
+    ${this.clickConfig(a + '_up',true)}
+    ${this.clickConfig(a+'_down',true)}`;
   }
 
-  iconConfig(a){
+  iconConfig(a,double=false){
     return y`
-          <ha-icon-picker id="icon-selector" label="${a === 'topicon' ? 'Entity' : a+' button'} icon" @opened-changed="${this.updateIt}" @value-changed="${this.updateIt}" .value="${a.includes('-') ? this._config.icons[a.replace('-','_')] : this._config.icons[a]}" ></ha-icon-picker>
+          <ha-icon-picker id="${double?a.replace('_','-')+'-':''}icon-selector" label="${a === 'topicon' ? 'Entity' : a.replace('_','-')+' button'} icon" @opened-changed="${this.updateIt}" @value-changed="${this.updateIt}" .value="${this._config.icons[a]}" ></ha-icon-picker>
         `;
-  } 
+  }
+
+  clickConfig(a,double=false){
+      let directSelector = y`
+        <ha-select id="${double?a.replace('_','-')+'-':''}click-service-selector" allow-custom-value .value="${ this._config.options[a].click.type === 'default' ? 'default' : this._config.options[a].click.entity }" label="What to do on ${a.replace('_','-')} click" @selected="${this.updateIt }" @closed="${ev => ev.stopPropagation()}"  >
+        <mwc-list-item .value="${'default'}">Default</mwc-list-item>
+        <mwc-list-item .value="${'toggle'}"> Toggle</mwc-list-item>
+        <mwc-list-item .value="${'turn-on'}"> Turn on</mwc-list-item>
+        <mwc-list-item .value="${'turn-off'}"> Turn off</mwc-list-item>
+          ${Object.keys(this.hass.states).filter(ent => ent.match(/automation|script/)).map(action => {
+                              return y` <mwc-list-item .value="${action}">${action}</mwc-list-item> `;
+                          })}
+        </ha-select>`;
+      let advancedSelector = y `
+        <ha-select id="${double?a.replace('_','-')+'-':''}click-service-selector"  .value="${ this._config.options[a].click.type }" label="What to do on ${a} click" @selected="${this.updateIt }" @closed="${ev => ev.stopPropagation()}"  >
+        <mwc-list-item .value="${'default'}">Default</mwc-list-item>
+        <mwc-list-item .value="${'toggle'}"> Toggle</mwc-list-item>
+        <mwc-list-item .value="${'turn-on'}"> Turn on</mwc-list-item>
+        <mwc-list-item .value="${'turn-off'}"> Turn off</mwc-list-item>
+        ${Object.keys(this.hass.states).filter(ent => ent.match(/automation|script/)).map(action => {
+                              return y` <mwc-list-item .value="${action}">${action}</mwc-list-item> `;
+                          })}
+        </ha-select>
+        <ha-select id="${double?a.replace('_','-')+'-':''}click-entity-selector"  .value="${this._config.options[a].click.entity !== undefined ? this._config.options[a].click.entity : null}"  label="Entity" @selected="${this.updateIt}" @closed="${ev => ev.stopPropagation()}"  >
+            ${Object.keys(this.hass.states).filter(e => !e.match(/script|automation|sensor|device_tracker|binary_sensor|number|update|person|sun|zone|persistent_notification|weather|input|camera|counter|select/)).map(entity => {
+                              return y` <mwc-list-item .value="${entity}">${entity}</mwc-list-item> `;
+                          })}
+          </ha-select>`;
+        console.log();
+        if(this._config.options[a].click.type.match(/toggle|turn-on|turn-off/))
+          return advancedSelector;
+        else
+          return directSelector;
+  }
 
   dblclickConfig(a){
     let directSelector = y`
-      <ha-select id="dblclick-service-selector" allow-custom-value .value="${ this._config.options[a].dblclick.type === 'no-action' ? 'no-action' : this._config.options[a].dblclick.entity }" label="What to invoke on double click" @selected="${this.updateIt }" @closed="${ev => ev.stopPropagation()}"  >
+      <ha-select id="dblclick-service-selector" allow-custom-value .value="${ this._config.options[a].dblclick.type === 'no-action' ? 'no-action' : this._config.options[a].dblclick.entity }" label="What to do on ${a} double click" @selected="${this.updateIt }" @closed="${ev => ev.stopPropagation()}"  >
         <mwc-list-item .value="${'no-action'}">Nothing</mwc-list-item>
         <mwc-list-item .value="${'toggle'}"> Toggle</mwc-list-item>
         <mwc-list-item .value="${'turn-on'}"> Turn on</mwc-list-item>
@@ -691,7 +619,7 @@ class ContentCardEditor extends s {
       </ha-select>`;
 
     let advancedSelector = y `
-      <ha-select id="dblclick-service-selector"  .value="${ this._config.options[a].dblclick.type }" label="What to invoke on double click" @selected="${this.updateIt }" @closed="${ev => ev.stopPropagation()}"  >
+      <ha-select id="dblclick-service-selector"  .value="${ this._config.options[a].dblclick.type }" label="What to do on ${a} double click" @selected="${this.updateIt }" @closed="${ev => ev.stopPropagation()}"  >
         <mwc-list-item .value="${'no-action'}">Nothing</mwc-list-item>
         <mwc-list-item .value="${'toggle'}"> Toggle</mwc-list-item>
         <mwc-list-item .value="${'turn-on'}"> Turn on</mwc-list-item>
@@ -708,13 +636,13 @@ class ContentCardEditor extends s {
 
       if(this._config.options[a].dblclick.type.match(/toggle|turn-on|turn-off/))
         return advancedSelector;
-      else 
+      else
         return directSelector;
 
   }
   holdConfig(a){
     let directSelector = y`
-      <ha-select id="hold-service-selector"  .value="${ this._config.options[a].hold.type === 'no-action' ? 'no-action' : this._config.options[a].hold.entity }" label="What to invoke on double click" @selected="${this.updateIt }" @closed="${ev => ev.stopPropagation()}"  >
+      <ha-select id="hold-service-selector"  .value="${ this._config.options[a].hold.type === 'no-action' ? 'no-action' : this._config.options[a].hold.entity }" label="What to do on ${a} hold" @selected="${this.updateIt }" @closed="${ev => ev.stopPropagation()}"  >
         <mwc-list-item .value="${'no-action'}">Nothing</mwc-list-item>
         <mwc-list-item .value="${'toggle'}"> Toggle</mwc-list-item>
         <mwc-list-item .value="${'turn-on'}"> Turn on</mwc-list-item>
@@ -725,7 +653,7 @@ class ContentCardEditor extends s {
       </ha-select>`;
 
     let advancedSelector = y `
-      <ha-select id="hold-service-selector"  .value="${ this._config.options[a].hold.type }" label="What to invoke on hold" @selected="${this.updateIt }" @closed="${ev => ev.stopPropagation()}"  >
+      <ha-select id="hold-service-selector"  .value="${ this._config.options[a].hold.type }" label="What to do on ${a} hold" @selected="${this.updateIt }" @closed="${ev => ev.stopPropagation()}"  >
         <mwc-list-item .value="${'no-action'}">Nothing</mwc-list-item>
         <mwc-list-item .value="${'toggle'}"> Toggle</mwc-list-item>
         <mwc-list-item .value="${'turn-on'}"> Turn on</mwc-list-item>
@@ -739,10 +667,10 @@ class ContentCardEditor extends s {
                             return y` <mwc-list-item .value="${entity}">${entity}</mwc-list-item> `;
                         })}
           </ha-select>`;
-          
+
       if(this._config.options[a].hold.type.match(/toggle|turn-on|turn-off/))
         return advancedSelector;
-      else 
+      else
         return directSelector;
 
   }
@@ -757,18 +685,18 @@ class ContentCardEditor extends s {
   }
   changeTab(e){
     if(Object.keys(this.tabs).filter(e => this.tabs[e] == true)[0].match(/power|source|mute/) )
-      if(Object.keys(this.tabs).filter(e => this.tabs[e] == true)[1].match(/dblclick|hold/))
+      if(Object.keys(this.tabs).filter(e => this.tabs[e] == true)[1].match(/click|dblclick|hold/))
         if(this._config.options[Object.keys(this.tabs).filter(e => this.tabs[e] == true)[0]][Object.keys(this.tabs).filter(e => this.tabs[e] == true)[1]].type.match(/toggle|turn-on|turn-off/) && this._config.options[Object.keys(this.tabs).filter(e => this.tabs[e] == true)[0]][Object.keys(this.tabs).filter(e => this.tabs[e] == true)[1]].entity === null)
           this._config.options[Object.keys(this.tabs).filter(e => this.tabs[e] == true)[0]][Object.keys(this.tabs).filter(e => this.tabs[e] == true)[1]].type = 'no-action';
-      if(e.currentTarget.classList[0].match(/^(dblclick|hold|icon|volume|channel)$/))
-        Object.keys(this.tabs).filter(val => val.match(/^(dblclick|hold|icon|volume|channel)$/)).forEach(va => this.tabs[va] = false);
+      if(e.currentTarget.classList[0].match(/^(click|dblclick|hold|icon|volume|channel)$/))
+        Object.keys(this.tabs).filter(val => val.match(/^(click|dblclick|hold|icon|volume|channel)$/)).forEach(va => this.tabs[va] = false);
       else if (e.currentTarget.classList[0].match(/^(power|mute|source|otherIcon|settings)$/)){
         Object.keys(this.tabs).forEach(e => this.tabs[e] = false);
         if(e.currentTarget.classList[0] != 'settings' )
           if(e.currentTarget.classList[0] === 'otherIcon')
             this.tabs['volume'] = true;
           else
-            this.tabs['dblclick'] = true;
+            this.tabs['click'] = true;
       }
       this.tabs[e.currentTarget.classList[0]] = true;
 
@@ -776,19 +704,24 @@ class ContentCardEditor extends s {
     }
 
 
-  updateIt(e,ha = this.hass){
+  updateIt(e, ha = this.hass) {
+
     if(e?.target.id === 'entity-selector'){
       this._config.entity = Object.keys(ha.states).filter(ent => ent.match('media_player[.]'))[e.detail.index] ;
     }
     if(this._config?.entity != undefined){
     if(!this._config.hasOwnProperty('name')){
-      this._config.name = this._config?.name?.length > 10 ? this.config.name.slice(0,10) : this._config?.name || this.hass.states[this._config?.entity].attributes.friendly_name.toUpperCase().length > 10 ? this.hass.states[this._config?.entity].attributes.friendly_name.toUpperCase().slice(0,10) : this.hass.states[this._config?.entity].attributes.friendly_name.toUpperCase();      
+      this._config.name = this._config?.name?.length > 10 ? this.config.name.slice(0,10) : this._config?.name || this.hass.states[this._config?.entity].attributes.friendly_name.toUpperCase().length > 10 ? this.hass.states[this._config?.entity].attributes.friendly_name.toUpperCase().slice(0,10) : this.hass.states[this._config?.entity].attributes.friendly_name.toUpperCase();
     }
     if(!this._config.hasOwnProperty('options')){
       this._config.options = {
-        power: {dblclick: {type: 'no-action',entity: null},hold:  {type: 'no-action',entity: null}},
-        source: {dblclick: {type: 'no-action',entity: null},hold:  {type: 'no-action',entity: null}},
-        mute: {dblclick: {type: 'no-action',entity: null},hold:  {type: 'no-action',entity: null}},
+        power: {click: {type: 'default',entity: null}, dblclick: {type: 'no-action',entity: null},hold:  {type: 'no-action',entity: null}},
+        source: {click: {type: 'default',entity: null}, dblclick: {type: 'no-action',entity: null},hold:  {type: 'no-action',entity: null}},
+        mute: { click: { type: 'default', entity: null }, dblclick: { type: 'no-action', entity: null }, hold: { type: 'no-action', entity: null } },
+        volume_up: { click: { type: 'default', entity: null } },
+        volume_down: { click: { type: 'default', entity: null } },
+        channel_up: { click: { type: 'default', entity: null } },
+        channel_down: { click: { type: 'default', entity: null } }
       };
     }
     if(this._config.hasOwnProperty('icons')){
@@ -816,6 +749,26 @@ class ContentCardEditor extends s {
       };
     }
 
+    if (e?.target.id === 'click-service-selector' || e?.target.id === 'click-entity-selector') {
+      if(this._config.options[Object.keys(this.tabs).filter(e => this.tabs[e] === true)[0]].click.type !== e.target.value || this._config.options[Object.keys(this.tabs).filter(e => this.tabs[e] === true)[0]].click.entity !== e.target.value)
+        if(e?.target.id === 'click-service-selector')
+          if(e.target.value.match(/toggle|turn-on|turn-off|default/)){
+            this._config.options[Object.keys(this.tabs).filter(e => this.tabs[e] === true)[0]].click.type = e.target.value;
+            if(e.target.value === 'default'){
+              this._config.options[Object.keys(this.tabs).filter(e => this.tabs[e] === true)[0]].click.type = 'default';
+              this._config.options[Object.keys(this.tabs).filter(e => this.tabs[e] === true)[0]].click.entity = null;}
+            this.putUpConfig();
+            this.requestUpdate();
+          }
+          else {
+            this._config.options[Object.keys(this.tabs).filter(e => this.tabs[e] === true)[0]].click.type = e.target.value.substring(0,e.target.value.indexOf('.'));
+            this._config.options[Object.keys(this.tabs).filter(e => this.tabs[e] === true)[0]].click.entity = e.target.value;
+          }
+        else if(e?.target.id === 'click-entity-selector' )
+          this._config.options[Object.keys(this.tabs).filter(e => this.tabs[e] === true)[0]].click.entity = e.target.value;
+      else
+        return;
+    }
       if(e?.target.id === 'hold-service-selector' || e?.target.id === 'hold-entity-selector'){
         if(this._config.options[Object.keys(this.tabs).filter(e => this.tabs[e] === true)[0]].hold.type !== e.target.value || this._config.options[Object.keys(this.tabs).filter(e => this.tabs[e] === true)[0]].hold.entity !== e.target.value)
           if(e?.target.id === 'hold-service-selector')
@@ -855,15 +808,124 @@ class ContentCardEditor extends s {
         else
           return;
       }
-      if(e?.target.id === 'icon-selector'){
+
+
+      if (e?.target.id === 'volume-up-click-service-selector' || e?.target.id === 'volume-up-click-entity-selector') {
+        if(this._config.options['volume_up'].click.type !== e.target.value || this._config.options['volume_up'].click.entity !== e.target.value)
+          if(e?.target.id === 'volume-up-click-service-selector')
+            if(e.target.value.match(/toggle|turn-on|turn-off|default/)){
+              this._config.options['volume_up'].click.type = e.target.value;
+              if(e.target.value === 'default'){
+                this._config.options['volume_up'].click.type = 'default';
+                this._config.options['volume_up'].click.entity = null;}
+              this.putUpConfig();
+              this.requestUpdate();
+            }
+            else {
+              this._config.options['volume_up'].click.type = e.target.value.substring(0,e.target.value.indexOf('.'));
+              this._config.options['volume_up'].click.entity = e.target.value;
+            }
+          else if(e?.target.id === 'volume-up-click-entity-selector' )
+            this._config.options['volume_up'].click.entity = e.target.value;
+        else
+          return;
+      }
+
+
+      if (e?.target.id === 'volume-down-click-service-selector' || e?.target.id === 'volume-down-click-entity-selector') {
+        if(this._config.options['volume_down'].click.type !== e.target.value || this._config.options['volume_down'].click.entity !== e.target.value)
+          if(e?.target.id === 'volume-down-click-service-selector')
+            if(e.target.value.match(/toggle|turn-on|turn-off|default/)){
+              this._config.options['volume_down'].click.type = e.target.value;
+              if(e.target.value === 'default'){
+                this._config.options['volume_down'].click.type = 'default';
+                this._config.options['volume_down'].click.entity = null;}
+              this.putUpConfig();
+              this.requestUpdate();
+            }
+            else {
+              this._config.options['volume_down'].click.type = e.target.value.substring(0,e.target.value.indexOf('.'));
+              this._config.options['volume_down'].click.entity = e.target.value;
+            }
+          else if(e?.target.id === 'volume-down-click-entity-selector' )
+            this._config.options['volume_down'].click.entity = e.target.value;
+        else
+          return;
+      }
+
+
+
+      if (e?.target.id === 'channel-up-click-service-selector' || e?.target.id === 'channel-up-click-entity-selector') {
+        if(this._config.options['channel_up'].click.type !== e.target.value || this._config.options['channel_up'].click.entity !== e.target.value)
+          if(e?.target.id === 'channel-up-click-service-selector')
+            if(e.target.value.match(/toggle|turn-on|turn-off|default/)){
+              this._config.options['channel_up'].click.type = e.target.value;
+              if(e.target.value === 'default'){
+                this._config.options['channel_up'].click.type = 'default';
+                this._config.options['channel_up'].click.entity = null;}
+              this.putUpConfig();
+              this.requestUpdate();
+            }
+            else {
+              this._config.options['channel_up'].click.type = e.target.value.substring(0,e.target.value.indexOf('.'));
+              this._config.options['channel_up'].click.entity = e.target.value;
+            }
+          else if(e?.target.id === 'channel-up-click-entity-selector' )
+            this._config.options['channel_up'].click.entity = e.target.value;
+        else
+          return;
+      }
+
+
+
+      if (e?.target.id === 'channel-down-click-service-selector' || e?.target.id === 'channel-down-click-entity-selector') {
+        if(this._config.options['channel_down'].click.type !== e.target.value || this._config.options['channel_down'].click.entity !== e.target.value)
+          if(e?.target.id === 'channel-down-click-service-selector')
+            if(e.target.value.match(/toggle|turn-on|turn-off|default/)){
+              this._config.options['channel_down'].click.type = e.target.value;
+              if(e.target.value === 'default'){
+                this._config.options['channel_down'].click.type = 'default';
+                this._config.options['channel_down'].click.entity = null;}
+              this.putUpConfig();
+              this.requestUpdate();
+            }
+            else {
+              this._config.options['channel_down'].click.type = e.target.value.substring(0,e.target.value.indexOf('.'));
+              this._config.options['channel_down'].click.entity = e.target.value;
+            }
+          else if(e?.target.id === 'channel-down-click-entity-selector' )
+            this._config.options['channel_down'].click.entity = e.target.value;
+        else
+          return;
+      }
+
+      if (e?.target.id === 'volume-up-icon-selector') {
         if(Object.keys(this.tabs).filter(e => this.tabs[e] === true)[0] === 'otherIcon')
-          this._config.icons[e.target.label.slice(0,e.target.label.indexOf(' ')).replace('-','_')] = e?.target?.value === undefined ? this._config.icons[e.target.label.slice(0,e.target.label.indexOf(' ')).replace('-','_')] : e?.target?.value;
-        else if(Object.keys(this.tabs).filter(e => this.tabs[e] === true)[0] === 'settings')
+          this._config.icons['volume_up'] = e?.target?.value === undefined ? this._config.icons['volume_up'] : e?.target?.value;
+      }
+
+      if (e?.target.id === 'volume-down-icon-selector') {
+        if(Object.keys(this.tabs).filter(e => this.tabs[e] === true)[0] === 'otherIcon')
+          this._config.icons['volume_down'] = e?.target?.value === undefined ? this._config.icons['volume_down'] : e?.target?.value;
+      }
+
+      if (e?.target.id === 'channel-up-icon-selector') {
+        if(Object.keys(this.tabs).filter(e => this.tabs[e] === true)[0] === 'otherIcon')
+          this._config.icons['channel_up'] = e?.target?.value === undefined ? this._config.icons['channel_up'] : e?.target?.value;
+      }
+
+      if (e?.target.id === 'channel-down-icon-selector') {
+        if(Object.keys(this.tabs).filter(e => this.tabs[e] === true)[0] === 'otherIcon')
+          this._config.icons['channel_down'] = e?.target?.value === undefined ? this._config.icons['channel_down'] : e?.target?.value;
+      }
+
+      if (e?.target.id === 'icon-selector') {
+        if(Object.keys(this.tabs).filter(e => this.tabs[e] === true)[0] === 'settings')
           this._config.icons['topicon'] = e?.target?.value === undefined ? this._config.icons['topicon'] : e?.target?.value;
         else
           this._config.icons[Object.keys(this.tabs).filter(e => this.tabs[e] === true)[0]] = e?.target?.value === undefined ? this._config.icons[Object.keys(this.tabs).filter(e => this.tabs[e] === true)[0]] : e?.target?.value;
-        
       }
+
       if(e?.target.id === 'name'){
         this.tmpName = e?.target.value;
         this._config.name = e?.target.value === '' ? this.hass.states[this._config?.entity].attributes.friendly_name.toUpperCase().length > 10 ? this.hass.states[this._config?.entity].attributes.friendly_name.toUpperCase().slice(0,10) : this.hass.states[this._config?.entity].attributes.friendly_name.toUpperCase() : e?.target.value;
@@ -873,7 +935,7 @@ class ContentCardEditor extends s {
     }
 
     chgConfig.detail = {config: this._config};
-    this.dispatchEvent(chgConfig); 
+    this.dispatchEvent(chgConfig);
     this.requestUpdate();
   }
   static get styles(){
@@ -914,7 +976,7 @@ class ContentCardEditor extends s {
         color: white
       }
       .tab-row .tab{
-        
+
         display: inline-block;
         margin-bottom: 0px;
       }
@@ -955,6 +1017,6 @@ window.customCards = window.customCards || [];
 window.customCards.push({
   type: "my-tv-card",
   name: "Touchpad remote for tv",
-  preview: false, 
+  preview: false,
   description: "A confortable tv remote with touchpad"
 });
