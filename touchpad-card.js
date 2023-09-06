@@ -207,23 +207,29 @@ class MyElement extends s {
           background-color:#6d767e;
         }
         `;
-}
+  }
+
 
 static getConfigElement() {
   return document.createElement("contento-card-editor");
 }
 
 static properties = {
-  _current_entity: {state: true},
+  _current_entity: { state: true },
 };
 
 constructor(){
   super();
   this.t = [];
 }
+set hass(hass) {
+  this._hass = hass;
+  this.requestUpdate();
+}
+
 
   render() {
-    this.t = Object.keys(this.config[this._current_entity].icons).slice(2);
+  this.t = Object.keys(this.config[this._current_entity].icons).slice(2);
   return y`
     <the-tv class="${this.config[this._current_entity].fancy_borders ? 'fancy-borders' : ''}"
       style=" height:${window.navigator.userAgent.includes("Home Assistant") ? '91vh' : window.navigator.brave != undefined ? '80vh' : '82vh' };">
@@ -242,8 +248,8 @@ constructor(){
 }
 
 tvIconOrSource() {
-  if(this.hass.states[this.config[this._current_entity].entity]?.attributes.entity_picture != undefined)
-    return y`<img src="${this.hass.states[this.config[this._current_entity].entity].attributes.entity_picture}" style="margin-left:30px;">
+  if(this._hass.states[this.config[this._current_entity].entity]?.attributes.entity_picture != undefined)
+    return y`<img src="${this._hass.states[this.config[this._current_entity].entity].attributes.entity_picture}" style="margin-left:30px;">
     `;
   else
     return y`<ha-icon icon="${this.config[this._current_entity].icons.topicon}"></ha-icon>
@@ -254,7 +260,7 @@ baseButton(cssName){
   let button = document.createElement('button');
   button.classList.add(cssName);
   if(cssName === 'power')
-    button.style.color = this.hass.states[this.config[this._current_entity].entity].state === 'on' ? 'green' : 'red';
+    button.style.color = this._hass.states[this.config[this._current_entity].entity].state === 'on' ? 'green' : 'red';
   let icon = document.createElement('ha-icon');
   icon.setAttribute('icon',this.config[this._current_entity].icons[cssName]);
   button.appendChild(icon);
@@ -302,48 +308,45 @@ baseButton(cssName){
 }
 
 touchpad (){
-    let touchpad = document.createElement('button');
-    touchpad.classList.add('touch-area');
-
-    touchpad.addEventListener('click', e => {
-      e.stopImmediatePropagation();
-      clickTimer = setTimeout(() => {
-        if(falseCheck){
-          this.execute({type: 'click',src: 'touchpad'});
-          this.feedback('light');
-        }
-        falseCheck=true;
-      }, 210);
-    });
-
-    touchpad.addEventListener('dblclick',e => {
-      e.stopImmediatePropagation();
-      this.feedback('success');
-      falseCheck = false;
-      clearTimeout(clickTimer);
-      clickTimer = null;
-      this.execute({type: 'dblclick',src: 'touchpad'});
-    });
-    touchpad.addEventListener('touchstart' ,e => {
-      e.stopImmediatePropagation();
-      this.touchStart(e);
-      holdTimer = setTimeout(() => {
-        this.feedback('medium');
-        this.execute({type: 'hold',src: 'touchpad'});
-      }, 700);
-    });
-
-    touchpad.addEventListener('touchmove',e => {
-      e.stopImmediatePropagation();
-      this.touchMove(e);
-    });
-
-    touchpad.addEventListener('touchend', e => {
-      e.stopImmediatePropagation();
-      clearTimeout(clickTimer);
-      clearTimeout(holdTimer);
-    });
-    return touchpad;
+  let touchpad = document.createElement('button');
+  touchpad.setAttribute('id','touchpad');
+  touchpad.classList.add('touch-area');
+  touchpad.addEventListener('click', e => {
+    e.stopImmediatePropagation();
+    clickTimer = setTimeout(() => {
+      if(falseCheck){
+        this.execute({type: 'click',src: 'touchpad'});
+        this.feedback('light');
+      }
+      falseCheck=true;
+    }, 210);
+  });
+  touchpad.addEventListener('dblclick',e => {
+    e.stopImmediatePropagation();
+    this.feedback('success');
+    falseCheck = false;
+    clearTimeout(clickTimer);
+    clickTimer = null;
+    this.execute({type: 'dblclick',src: 'touchpad'});
+  });
+  touchpad.addEventListener('touchstart' ,e => {
+    e.stopImmediatePropagation();
+    this.touchStart(e);
+    holdTimer = setTimeout(() => {
+      this.feedback('medium');
+      this.execute({type: 'hold',src: 'touchpad'});
+    }, 700);
+  });
+  touchpad.addEventListener('touchmove',e => {
+    e.stopImmediatePropagation();
+    this.touchMove(e);
+  });
+  touchpad.addEventListener('touchend', e => {
+    e.stopImmediatePropagation();
+    clearTimeout(clickTimer);
+    clearTimeout(holdTimer);
+  });
+  return touchpad;
   }
 
   execute(act) {
@@ -352,51 +355,75 @@ touchpad (){
         case 'click':
           switch (act.src) {
             case 'power':
-              this.hass.callService('homeassistant','toggle',{entity_id: this.config[this._current_entity].entity});
+              this._hass.callService('homeassistant','toggle',{entity_id: this.config[this._current_entity].entity});
               break;
             case 'channel_up':
-              this.hass.callService('media_player','play_media',{media_content_id: 'KEY_CHUP',media_content_type: 'send_key'},{entity_id: this.config[this._current_entity].entity});
+              if(this._hass.entities[this.config[this._current_entity].entity].platform.includes('samsungtv_smart'))
+                this._hass.callService('media_player','play_media',{media_content_id: 'KEY_CHUP',media_content_type: 'send_key'},{entity_id: this.config[this._current_entity].entity});
+              else
+                this._hass.callService('remote', 'send_command', { command: 'KEY_CHUP' }, { entity_id: this.config[this._current_entity].entity.replace("media_player", "remote") });
               break;
             case 'channel_down':
-              this.hass.callService('media_player','play_media',{media_content_id: 'KEY_CHDOWN',media_content_type: 'send_key'},{entity_id: this.config[this._current_entity].entity});
+              if(this._hass.entities[this.config[this._current_entity].entity].platform.includes('samsungtv_smart'))
+                this._hass.callService('media_player','play_media',{media_content_id: 'KEY_CHDOWN',media_content_type: 'send_key'},{entity_id: this.config[this._current_entity].entity});
+              else
+                this._hass.callService('remote', 'send_command', { command: 'KEY_CHDOWN' }, { entity_id: this.config[this._current_entity].entity.replace("media_player", "remote") });
               break;
             case 'volume_up':
-              this.hass.callService('media_player','volume_up',{entity_id: this.config[this._current_entity].entity});
+              this._hass.callService('media_player','volume_up',{entity_id: this.config[this._current_entity].entity});
               break;
             case 'volume_down':
-              this.hass.callService('media_player','volume_down',{entity_id: this.config[this._current_entity].entity});
+              this._hass.callService('media_player','volume_down',{entity_id: this.config[this._current_entity].entity});
               break;
             case 'source':
-              this.hass.callService('media_player','play_media',{media_content_id: 'KEY_SOURCE',media_content_type: 'send_key'},{entity_id: this.config[this._current_entity].entity});
+              if (this._hass.entities[this.config[this._current_entity].entity].platform.includes('samsungtv_smart'))
+                this._hass.callService('media_player','play_media',{media_content_id: 'KEY_SOURCE',media_content_type: 'send_key'},{entity_id: this.config[this._current_entity].entity});
+              else
+                this._hass.callService('remote', 'send_command', { command: 'KEY_SOURCE' }, { entity_id: this.config[this._current_entity].entity.replace("media_player", "remote") });
               break;
             case 'mute':
-              this.hass.callService('media_player','volume_mute',{is_volume_muted: !this.hass.states[this.config[this._current_entity].entity].attributes.is_volume_muted},{entity_id: this.config[this._current_entity].entity});
+              this._hass.callService('media_player','volume_mute',{is_volume_muted: !this._hass.states[this.config[this._current_entity].entity].attributes.is_volume_muted},{entity_id: this.config[this._current_entity].entity});
               break;
             case 'touchpad':
-              this.hass.callService('media_player','play_media',{media_content_id: 'KEY_ENTER',media_content_type: 'send_key'},{entity_id: this.config[this._current_entity].entity});
+              if (this._hass.entities[this.config[this._current_entity].entity].platform.includes('samsungtv_smart'))
+                this._hass.callService('media_player','play_media',{media_content_id: 'KEY_ENTER',media_content_type: 'send_key'},{entity_id: this.config[this._current_entity].entity});
+              else
+                this._hass.callService('remote', 'send_command', { command: 'KEY_ENTER' }, { entity_id: this.config[this._current_entity].entity.replace("media_player", "remote") });
               break;
           }
           break;
         case 'dblclick':
           if (act.source === 'touchpad')
-            this.hass.callService('media_player','play_media',{media_content_id: 'KEY_RETURN',media_content_type: 'send_key'},{entity_id: this.config[this._current_entity].entity});
+            if(this._hass.entities[this.config[this._current_entity].entity].platform.includes('samsungtv_smart'))
+              this._hass.callService('media_player','play_media',{media_content_id: 'KEY_RETURN',media_content_type: 'send_key'},{entity_id: this.config[this._current_entity].entity});
+            else
+              this._hass.callService('remote','send_command', { command: 'KEY_RETURN' }, { entity_id: this.config[this._current_entity].entity.replace("media_player", "remote") });
           break;
         case 'hold':
           switch (act.src) {
             case 'touchpad':
-              this.hass.callService('media_player', 'play_media', { media_content_id: 'KEY_HOME', media_content_type: 'send_key' }, { entity_id: this.config[this._current_entity].entity });
+              if(this._hass.entities[this.config[this._current_entity].entity].platform.includes('samsungtv_smart'))
+                this._hass.callService('media_player', 'play_media', { media_content_id: 'KEY_HOME', media_content_type: 'send_key' }, { entity_id: this.config[this._current_entity].entity });
+              else
+                this._hass.callService('remote','send_command',{command: 'KEY_HOME'},{entity_id: this.config[this._current_entity].entity.replace("media_player", "remote")});
               break;
             case 'channel_up':
-              this.hass.callService('media_player', 'play_media', { media_content_id: 'KEY_CHUP', media_content_type: 'send_key' }, { entity_id: this.config[this._current_entity].entity });
+              if (this._hass.entities[this.config[this._current_entity].entity].platform.includes('samsungtv_smart'))
+                this._hass.callService('media_player', 'play_media', { media_content_id: 'KEY_CHUP', media_content_type: 'send_key' }, { entity_id: this.config[this._current_entity].entity });
+              else
+                this._hass.callService('remote', 'send_command', { command: 'KEY_CHUP' }, { entity_id: this.config[this._current_entity].entity.replace("media_player", "remote") });
               break;
             case 'channel_down':
-              this.hass.callService('media_player', 'play_media', { media_content_id: 'KEY_CHDOWN', media_content_type: 'send_key' }, { entity_id: this.config[this._current_entity].entity });
+              if(this._hass.entities[this.config[this._current_entity].entity].platform.includes('samsungtv_smart'))
+                this._hass.callService('media_player', 'play_media', { media_content_id: 'KEY_CHDOWN', media_content_type: 'send_key' }, { entity_id: this.config[this._current_entity].entity });
+              else
+                this._hass.callService('remote', 'send_command', { command: 'KEY_CHDOWN' }, { entity_id: this.config[this._current_entity].entity.replace("media_player", "remote") });
               break;
             case 'volume_up':
-              this.hass.callService('media_player', 'volume_up', { entity_id: this.config[this._current_entity].entity });
+              this._hass.callService('media_player', 'volume_up', { entity_id: this.config[this._current_entity].entity });
               break;
             case 'volume_down':
-              this.hass.callService('media_player', 'volume_down', { entity_id: this.config[this._current_entity].entity });
+              this._hass.callService('media_player', 'volume_down', { entity_id: this.config[this._current_entity].entity });
               break;
           }
           break;
@@ -404,108 +431,119 @@ touchpad (){
     } else {
       switch (this.config[this._current_entity].actions[act.src][act.type].type) {
         case 'script':
-          this.hass.callService('script', this.config[this._current_entity].actions[act.src][act.type].entity.substring(this.config[this._current_entity].actions[act.src][act.type].entity.indexOf('.') + 1));
+          this._hass.callService('script', this.config[this._current_entity].actions[act.src][act.type].entity.substring(this.config[this._current_entity].actions[act.src][act.type].entity.indexOf('.') + 1));
           break;
         case 'automation':
-          this.hass.callService('automation', 'trigger', { entity_id: this.config[this._current_entity].actions[act.src][act.type].entity });
+          this._hass.callService('automation', 'trigger', { entity_id: this.config[this._current_entity].actions[act.src][act.type].entity });
           break;
         case 'toggle':
-          this.hass.callService('homeassistant', 'toggle', { entity_id: this.config[this._current_entity].actions[act.src][act.type].entity });
+          this._hass.callService('homeassistant', 'toggle', { entity_id: this.config[this._current_entity].actions[act.src][act.type].entity });
           break;
         case 'turn-on':
-          this.hass.callService('homeassistant', 'turn_on', { entity_id: this.config[this._current_entity].actions[act.src][act.type].entity });
+          this._hass.callService('homeassistant', 'turn_on', { entity_id: this.config[this._current_entity].actions[act.src][act.type].entity });
           break;
         case 'turn-off':
-          this.hass.callService('homeassistant', 'turn_off', { entity_id: this.config[this._current_entity].actions[act.src][act.type].entity });
+          this._hass.callService('homeassistant', 'turn_off', { entity_id: this.config[this._current_entity].actions[act.src][act.type].entity });
           break;
       }
     }
   }
 
-
-
-
-
-moreInfoAction(node){
-  moreInfo.detail = {entityId: this.config[this._current_entity].entity};
-  node.dispatchEvent(moreInfo);
-}
-feedback(type){
-  vibrate.detail = type;
-  window.dispatchEvent(vibrate);
-}
-touchStart(e){
-  window.initialX = e.touches[0].clientX;
-  window.initialY = e.touches[0].clientY;
-}
-
-changeCurrentEntity(e) {
-
-
-  if( ! initialX || ! initialY){
-    return;
+  moreInfoAction(node){
+    moreInfo.detail = {entityId: this.config[this._current_entity].entity};
+    node.dispatchEvent(moreInfo);
+  }
+  feedback(type){
+    vibrate.detail = type;
+    window.dispatchEvent(vibrate);
+  }
+  touchStart(e) {
+    window.initialX = e.touches[0].clientX;
+    window.initialY = e.touches[0].clientY;
   }
 
-  var currentX = e.touches[0].clientX;
-  var currentY = e.touches[0].clientY;
+  changeCurrentEntity(e) {
 
-  var diffX = initialX - currentX;
-  var diffY = initialY - currentY;
 
-  if (Math.abs(diffX) > Math.abs(diffY)) {
-    if (diffX > 0) {
-      if (Object.keys(this.config).indexOf(this._current_entity) === Object.keys(this.config).length-1)
-        console.log('last element');
+    if( ! initialX || ! initialY){
+      return;
+    }
+
+    var currentX = e.touches[0].clientX;
+    var currentY = e.touches[0].clientY;
+
+    var diffX = initialX - currentX;
+    var diffY = initialY - currentY;
+
+    if (Math.abs(diffX) > Math.abs(diffY)) {
+      if (diffX > 0) {
+        if (!(Object.keys(this.config).indexOf(this._current_entity) === Object.keys(this.config).length - 1))
+          this._current_entity = Object.keys(this.config)[Object.keys(this.config).indexOf(this._current_entity) + 1];
+      } else {
+        if (!(Object.keys(this.config).indexOf(this._current_entity) === 1))
+          this._current_entity = Object.keys(this.config)[Object.keys(this.config).indexOf(this._current_entity) - 1];
+      }
+    }
+    initialX = null;
+    initialY = null;
+    this.requestUpdate();
+  }
+
+  touchMove(e, ha = this._hass) {
+    if( ! initialX || ! initialY){
+      return;
+    }
+
+    var currentX = e.touches[0].clientX;
+    var currentY = e.touches[0].clientY;
+
+    var diffX = initialX - currentX;
+    var diffY = initialY - currentY;
+
+    if (Math.abs(diffX) > Math.abs(diffY)) {
+      if (diffX > 0) {
+        if(ha.entities[this.config[this._current_entity].entity].platform.includes('samsungtv_smart'))
+          ha.callService("media_player", "play_media", { media_content_id: "KEY_LEFT", media_content_type: "send_key" }, { entity_id: this.config[this._current_entity].entity });
+        else
+          ha.callService("remote", "send_command", { command: "KEY_LEFT" }, { entity_id: this.config[this._current_entity].entity.replace("media_player", "remote") });
+        this.feedback('selection');
+      } else {
+        if(ha.entities[this.config[this._current_entity].entity].platform.includes('samsungtv_smart'))
+          ha.callService("media_player", "play_media", { media_content_id: "KEY_RIGHT", media_content_type: "send_key" }, { entity_id: this.config[this._current_entity].entity });
+        else
+          ha.callService("remote", "send_command", { command: "KEY_RIGHT" }, { entity_id: this.config[this._current_entity].entity.replace("media_player", "remote") });
+        this.feedback('selection');
+      }
+    } else {
+      if (diffY > 0) {
+        if(ha.entities[this.config[this._current_entity].entity].platform.includes('samsungtv_smart'))
+          ha.callService("media_player", "play_media", { media_content_id: "KEY_UP", media_content_type: "send_key" }, { entity_id: this.config[this._current_entity].entity });
+        else
+          ha.callService("remote", "send_command", { command: "KEY_UP" }, { entity_id: this.config[this._current_entity].entity.replace("media_player", "remote") });
+        this.feedback('selection');
+      } else {
+        if (ha.entities[this.config[this._current_entity].entity].platform.includes('samsungtv_smart'))
+          ha.callService("media_player", "play_media", { media_content_id: "KEY_DOWN", media_content_type: "send_key" }, { entity_id: this.config[this._current_entity].entity });
+        else
+          ha.callService("remote", "send_command", { command: "KEY_DOWN" }, { entity_id: this.config[this._current_entity].entity.replace("media_player", "remote") });
+        this.feedback('selection');
+      }
+    }
+    initialX = null;
+    initialY = null;
+  }
+  setConfig(config) {
+    if (Object.keys(config).length < 2)
+        throw new Error('You need to define an entity');
+    this.config = config;
+    if (this._current_entity === undefined || this.config[this._current_entity] === undefined)
+      if( !Object.keys(this.config).slice(1).find(item => this.config[item].position === 1))
+        this._current_entity = Object.keys(this.config)[1];
       else
-        this._current_entity = Object.keys(this.config)[Object.keys(this.config).indexOf(this._current_entity) + 1];
-    } else {
-      if (Object.keys(this.config).indexOf(this._current_entity) === 1)
-        console.log('first element');
-      else
-        this._current_entity = Object.keys(this.config)[Object.keys(this.config).indexOf(this._current_entity) - 1];
-    }
+        this._current_entity = Object.keys(this.config).slice(1).find(item => this.config[item].position === 1);
+    this.requestUpdate();
   }
-  initialX = null;
-  initialY = null;
-  this.requestUpdate();
-}
-
-touchMove(e, ha = this.hass) {
-  if( ! initialX || ! initialY){
-    return;
   }
-
-  var currentX = e.touches[0].clientX;
-  var currentY = e.touches[0].clientY;
-
-  var diffX = initialX - currentX;
-  var diffY = initialY - currentY;
-
-  if (Math.abs(diffX) > Math.abs(diffY)) {
-    if (diffX > 0) {
-        ha.callService("media_player","play_media",{media_content_id: "KEY_LEFT", media_content_type: "send_key"},{entity_id: this.config[this._current_entity].entity});
-    } else {
-        ha.callService("media_player","play_media",{media_content_id: "KEY_RIGHT", media_content_type: "send_key"},{entity_id: this.config[this._current_entity].entity});
-    }
-  } else {
-    if (diffY > 0) {
-      ha.callService("media_player","play_media",{media_content_id: "KEY_UP", media_content_type: "send_key"},{entity_id: this.config[this._current_entity].entity});
-    } else {
-      ha.callService("media_player","play_media",{media_content_id: "KEY_DOWN", media_content_type: "send_key"},{entity_id: this.config[this._current_entity].entity});
-    }
-  }
-  initialX = null;
-  initialY = null;
-}
-setConfig(config) {
-  if (Object.keys(config).length < 2)
-      throw new Error('You need to define an entity');
-  this.config = config;
-  if (this._current_entity === undefined || this.config[this._current_entity] === undefined)
-    this._current_entity = Object.keys(this.config)[1];
-  this.requestUpdate();
-}
-}
 class ContentCardEditor extends s {
 
   static get properties() {
@@ -527,139 +565,49 @@ class ContentCardEditor extends s {
     this.updateIt();
     this.tabs = { power: false, source: false, mute: false, otherIcon: false, settings: true, icon: false, click: false, dblclick: false, hold: false, volume: false, channel: false };
     this.entityTabs = {};
-    this.newEnt = false;
+    this.newEnt = true;
     this.moveHint = true;
     this.displayMessage = false;
     this.setMessage('Thank you');
     this.tmpName = '';
   }
 
-  setConfig(config) {
-    this._config = JSON.parse(JSON.stringify(config));
-    console.log(Object.keys(this.entityTabs).length);
-    if (Object.keys(this.entityTabs).length === 0)
-      Object.keys(this._config).slice(1).forEach(e => {
-        this.entityTabs[e] = false;
-      });
-    if (Object.keys(this._config).length > 1) {
-      if (Object.values(this.entityTabs).every(element => element === false) || Object.values(this.entityTabs).every(element => element === true)) {
-        this.entityTabs[Object.keys(this.entityTabs)[0]] = true;
-      }
-      if (Object.keys(this._config).length === 2)
-        this.entityTabs[Object.keys(this.entityTabs)[0]] = true;
-
-    }
-  }
-
   render() {
-      return y`
-        ${this.makeMeEntityTabMenu()}
-      `;
-    }
+    return y`
+      ${this.makeMeEntityTabMenu()}
+    `;
+  }
 
   makeMeEntityTabMenu() {
     return y`
         ${this.alert()}
         <div class="ent-tab-row " >
-          <div class="default tab ${this.entityTabs[Object.keys(this.entityTabs)[0]] ? 'selected' : this.entityTabs[Object.keys(this.entityTabs)[0]] === undefined ? 'selected' : ''}" @click="${()=>this.changeCurrentEntity(Object.keys(this.entityTabs)[0])}">${Object.keys(this.entityTabs)[0] === undefined ? 'New' : Object.keys(this.entityTabs)[0].slice(0,5)}</div>
-          ${Object.keys(this.entityTabs).slice(1).map(e => {
-            return y` <div class="tab ${this.entityTabs[e] ? 'selected' : ''}" @click="${()=>this.changeCurrentEntity(e)}">${e.slice(0,5)}</div> `;
+          ${Object.keys(this.entityTabs).map(e => {
+            return y` <div class="tab ${this.entityTabs[e] ? 'selected' : ''}" @touchstart="${this.entityTabs[e] ? this.touchStart : null}" @touchmove="${this.entityTabs[e] ? this.moveCurrentEntity : null}" @click="${()=>this.changeCurrentEntity(e)}">${e.slice(0,5)}</div> `;
           })}
           ${this.newEntityTab()}
         </div>
       <ha-select class="main" id="entity-selector"  .value="${ this._config?.[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)]?.entity }"  label="Entity" @selected="${this.updateIt}" @closed="${ev => ev.stopPropagation()}"  >
-      ${Object.keys(this.hass.states).filter(ent => ent.match('media_player[.]')).map(entity => {
-                        return y` <mwc-list-item .value="${entity}">${entity}</mwc-list-item> `;
+      ${Object.keys(this.hass.states).filter(ent => ent.match('media_player[.]')).map((entity) => {
+        if (this._config[entity.substring(13)] === undefined && !this.hass.entities[entity].platform.includes('cast'))
+          return y` <mwc-list-item .value="${entity}">${entity}</mwc-list-item> `;
+        else if (this._config[entity.substring(13)] !== undefined && entity.substring(13) === Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)[0] && !this.hass.entities[entity].platform.includes('cast'))
+          return y` <mwc-list-item .value="${entity}" selected>${entity}</mwc-list-item> `;
                     })}
       </ha-select>
       ${this._config?.[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)] != undefined ? this.makeMeTabMenu() : null}
       `;
   }
 
-  alert() {
-    let alert = document.createElement('div');
-    alert.classList.add('alerts');
-    alert.classList.add('fade');
-    alert.style.color = this.displayMessage ? 'var(--mdc-theme-primary)' : 'transparent';
-    alert.innerHTML = this.message;
-    alert.offsetWidth;
-  }
-
-
-  newEntityTab() {
-    if(this.newEnt)
-      return y`<div class="tab new selected" @click="${this.changeCurrentEntity}">New</div>`;
-    else if (this._config?.[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)] != undefined)
-      return y`
-      <div class="add tab" @click="${this.addEntity}"><ha-icon icon="mdi:plus"></ha-icon></div>
-      <div class="remove action-tab"><ha-icon icon="mdi:delete" @touchstart="${()=> this.removeEnt('start')}" @touchend="${()=>this.removeEnt('stop')}" @click="${()=>this.setMessage('long press to remove')}"></ha-icon></div>
-      `;
-  }
-
-
-  addEntity() {
-    Object.keys(this.entityTabs).forEach(e => {
-      this.entityTabs[e] = false;
-    });
-    this.newEnt = true;
-  }
-
-  removeEnt(what) {
-    if (what === 'start')
-      holdRemove = setTimeout(() => {
-        let entToRemove = Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true);
-        console.log(entToRemove);
-        delete this._config[entToRemove];
-        delete this.entityTabs[entToRemove];
-
-        this.setMessage('removed ' + entToRemove);
-        if (Object.keys(this.entityTabs).length !== 0)
-          this.entityTabs[Object.keys(this.entityTabs)[0]] = true;
-      }, 1000);
-    else if (what === 'stop')
-      clearTimeout(holdRemove);
-  }
-
-  setMessage(message) {
-    this.message = message;
-    this.displayMessage = false;
-    this.displayMessage = true;
-    clearTimeout(msg);
-    msg = setTimeout(() => {
-      this.displayMessage = false;
-    }, 3000);
-
-  }
-
-  moveEntity() {
-    console.log('moveent');
-  }
-
-
-
-  changeCurrentEntity(caller) {
-    if (this.moveHint) {
-      this.setMessage('swipe on the entity tab to move it');
-      this.moveHint = false;
-    }
-    Object.keys(this.entityTabs).forEach(e => {
-      this.entityTabs[e] = false;
-    });
-    this.entityTabs[caller] = true;
-
-    chgConfig.detail = { config: this._config };
-    this.dispatchEvent(chgConfig);
-    this.requestUpdate();
-  }
 
     makeMeTabMenu(){
       return y`
           <div class="tab-row" >
-            <div class="power tab ${this.tabs.power ? 'selected' : ''}" @click="${this.changeTab}"><ha-icon icon="mdi:power"></ha-icon></div>
-            <div class="source tab ${this.tabs.source ? 'selected' : ''}" @click="${this.changeTab}"><ha-icon icon="mdi:logout-variant"></ha-icon></div>
-            <div class="mute tab ${this.tabs.mute ? 'selected' : ''}" @click="${this.changeTab}"><ha-icon icon="mdi:volume-mute"></ha-icon></div>
-            <div class="otherIcon tab ${this.tabs.otherIcon ? 'selected' : ''}" @click="${this.changeTab}"><ha-icon icon="mdi:plus-minus-variant"></ha-icon></div>
-            <div class="settings tab ${this.tabs.settings ? 'selected' : ''}" @click="${this.changeTab}"><ha-icon icon="mdi:tune"></ha-icon></div>
+            <div class="power tab ${this.tabs.power ? 'selected' : ''}" @click="${()=>{this.changeTab('power')}}"><ha-icon icon="mdi:power"></ha-icon></div>
+            <div class="source tab ${this.tabs.source ? 'selected' : ''}" @click="${()=>{this.changeTab('source')}}"><ha-icon icon="mdi:logout-variant"></ha-icon></div>
+            <div class="mute tab ${this.tabs.mute ? 'selected' : ''}" @click="${()=>{this.changeTab('mute')}}"><ha-icon icon="mdi:volume-mute"></ha-icon></div>
+            <div class="otherIcon tab ${this.tabs.otherIcon ? 'selected' : ''}" @click="${()=>{this.changeTab('otherIcon')}}"><ha-icon icon="mdi:plus-minus-variant"></ha-icon></div>
+            <div class="settings tab ${this.tabs.settings ? 'selected' : ''}" @click="${()=>{this.changeTab('settings')}}"><ha-icon icon="mdi:tune"></ha-icon></div>
           </div>
           <div class="sub-tabs">
           ${this.subTabs()}
@@ -670,10 +618,10 @@ class ContentCardEditor extends s {
   subTabs(){
     let normalCase =  y`
           <div class="sub-tabs-row ${this.tabs.settings ? 'hide' : 'show'}" >
-            <div class="click tab ${this.tabs.click ? 'sub-selected' : ''}" @click="${this.changeTab}">Click</div>
-            <div class="dblclick tab ${this.tabs.dblclick ? 'sub-selected' : ''}" @click="${this.changeTab}">Double click</div>
-            <div class="hold tab ${this.tabs.hold ? 'sub-selected' : ''}" @click="${this.changeTab}">Hold</div>
-            <div class="icon tab ${this.tabs.icon ? 'sub-selected' : ''}" @click="${this.changeTab}">Icon</div>
+            <div class="click tab ${this.tabs.click ? 'sub-selected' : ''}" @click="${()=>{this.changeTab('click')}}">Click</div>
+            <div class="dblclick tab ${this.tabs.dblclick ? 'sub-selected' : ''}" @click="${()=>{this.changeTab('dblclick')}}">Double click</div>
+            <div class="hold tab ${this.tabs.hold ? 'sub-selected' : ''}" @click="${()=>{this.changeTab('hold')}}">Hold</div>
+            <div class="icon tab ${this.tabs.icon ? 'sub-selected' : ''}" @click="${()=>{this.changeTab('icon')}}">Icon</div>
           </div>
           <div class="content">
             ${this.putUpConfig()}
@@ -681,8 +629,8 @@ class ContentCardEditor extends s {
 
     let otherIcon = y`
         <div class="sub-tabs-row show" >
-          <div class="volume tab ${this.tabs.volume ? 'sub-selected' : ''}" @click="${this.changeTab}">Volume</div>
-          <div class="channel tab ${this.tabs.channel ? 'sub-selected' : ''}" @click="${this.changeTab}">Channel</div>
+          <div class="volume tab ${this.tabs.volume ? 'sub-selected' : ''}" @click="${()=>{this.changeTab('volume')}}">Volume</div>
+          <div class="channel tab ${this.tabs.channel ? 'sub-selected' : ''}" @click="${()=>{this.changeTab('channel')}}">Channel</div>
         </div>
         <div class="content">
           ${this.putUpConfig()}
@@ -755,7 +703,6 @@ clickConfig(a,double=false){
                               return y` <mwc-list-item .value="${entity}">${entity}</mwc-list-item> `;
                           })}
           </ha-select>`;
-        console.log();
         if(this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)].actions[a].click.type.match(/toggle|turn-on|turn-off/))
           return advancedSelector;
         else
@@ -844,32 +791,219 @@ changeTab(e) {
       if(Object.keys(this.tabs).filter(e => this.tabs[e] == true)[1].match(/click|dblclick|hold/))
         if(this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)].actions[Object.keys(this.tabs).filter(e => this.tabs[e] == true)[0]][Object.keys(this.tabs).filter(e => this.tabs[e] == true)[1]].type.match(/toggle|turn-on|turn-off/) && this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)].actions[Object.keys(this.tabs).filter(e => this.tabs[e] == true)[0]][Object.keys(this.tabs).filter(e => this.tabs[e] == true)[1]].entity === null)
           this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)].actions[Object.keys(this.tabs).filter(e => this.tabs[e] == true)[0]][Object.keys(this.tabs).filter(e => this.tabs[e] == true)[1]].type = 'no-action';
-    if(e.currentTarget.classList[0].match(/^(click|dblclick|hold|icon|volume|channel)$/))
+    if(e.match(/^(click|dblclick|hold|icon|volume|channel)$/))
         Object.keys(this.tabs).filter(val => val.match(/^(click|dblclick|hold|icon|volume|channel)$/)).forEach(va => this.tabs[va] = false);
-      else if (e.currentTarget.classList[0].match(/^(power|mute|source|otherIcon|settings)$/)){
+      else if (e.match(/^(power|mute|source|otherIcon|settings)$/)){
         Object.keys(this.tabs).forEach(e => this.tabs[e] = false);
-        if(e.currentTarget.classList[0] != 'settings' )
-          if(e.currentTarget.classList[0] === 'otherIcon')
+        if(e != 'settings' )
+          if(e === 'otherIcon')
             this.tabs['volume'] = true;
           else
             this.tabs['click'] = true;
       }
-      this.tabs[e.currentTarget.classList[0]] = true;
+      this.tabs[e] = true;
 
       this.requestUpdate();
+}
+
+setConfig(config) {
+  this.orderConfig(config);
+  if (Object.keys(this.entityTabs).length === 0)
+    Object.keys(this._config).slice(1).forEach(e => {
+      this.entityTabs[e] = false;
+    });
+  if (Object.keys(this._config).length > 1) {
+    if (Object.values(this.entityTabs).every(element => element === false) || Object.values(this.entityTabs).every(element => element === true)) {
+      this.entityTabs[Object.keys(this.entityTabs)[0]] = true;
     }
+    if (Object.keys(this._config).length === 2)
+      this.entityTabs[Object.keys(this.entityTabs)[0]] = true;
+  }
+}
+
+orderConfig(config){
+  let tempConfig = JSON.parse(JSON.stringify(config));
+  if (Object.keys(tempConfig).length > 0) {
+    let newOrder = Object.keys(tempConfig).slice(1).sort(
+      (a, b) => {
+        return tempConfig[a].position - tempConfig[b].position
+      });
+    delete this._config;
+    this._config = {};
+    this._config.type = tempConfig.type;
+
+    newOrder.forEach((item) => {
+      this._config[item] = JSON.parse(JSON.stringify(tempConfig[item]));
+    });
+    for (let i = 1; i < Object.keys(this._config).length; i++) {
+      this._config[Object.keys(this._config)[i]].position = i;
+    }
+  }
+  else
+    this._config = JSON.parse(JSON.stringify(tempConfig));
+  return this._config;
+}
+
+orderEntityTabs(){
+  let tempEntityTabs = {};
+  let newOrder = Object.keys(this.entityTabs).sort(
+    (a, b) => {
+      return this._config[a].position - this._config[b].position
+    });
+  delete this.entityTabs;
+  newOrder.forEach((item) => {
+    tempEntityTabs[item] = this.entityTabs[item];
+  });
+  this.entityTabs = tempEntityTabs;
+}
+
+alert() {;
+  let alert = document.createElement('div');
+  alert.classList.add('alerts', 'fade');
+  alert.style.color = this.displayMessage ? 'var(--mdc-theme-primary)' : 'transparent';
+  alert.innerHTML = this.message;
+  alert.offsetWidth;
+  return alert;
+}
+
+
+newEntityTab() {
+  if(this.newEnt)
+    return y`<div class="tab new selected" @click="${this.changeCurrentEntity}">New</div>`;
+  else if (this._config?.[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)] != undefined)
+    return y`
+    <div class="add tab" @click="${this.addEntity}"><ha-icon icon="mdi:plus"></ha-icon></div>
+    <div class="remove action-tab"><ha-icon icon="mdi:delete" @touchstart="${()=> this.removeEnt('start')}" @touchend="${()=>this.removeEnt('stop')}" @click="${()=>this.setMessage('long press to remove')}"></ha-icon></div>
+    `;
+}
+
+addEntity() {
+  Object.keys(this.entityTabs).forEach(e => {
+    this.entityTabs[e] = false;
+  });
+  this.newEnt = true;
+}
+
+removeEnt(what) {
+  if (what === 'start')
+    holdRemove = setTimeout(() => {
+      let entToRemove = Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true);
+      let i = Object.keys(this._config).indexOf(entToRemove[0]);
+      delete this._config[entToRemove];
+      delete this.entityTabs[entToRemove];
+      if (Object.keys(this._config).length === 1)
+        this.newEnt = true;
+      else
+        this.entityTabs[Object.keys(this.entityTabs)[0]] = true;
+      for (i; i < Object.keys(this._config).length; i++){
+        this._config[Object.keys(this._config)[i]].position = i;
+      }
+      this.setMessage('removed ' + entToRemove);
+
+    }, 1000);
+  else if (what === 'stop')
+    clearTimeout(holdRemove);
+}
+
+setMessage(message) {
+  this.message = message;
+  this.displayMessage = false;
+  this.displayMessage = true;
+  clearTimeout(msg);
+  msg = setTimeout(() => {
+    this.displayMessage = false;
+  }, 5000);
+
+}
+
+touchStart(e){
+  window.initialX = e.touches[0].clientX;
+  window.initialY = e.touches[0].clientY;
+}
+
+moveCurrentEntity(e) {
+  if( ! initialX || ! initialY){
+    return;
+  }
+
+  var currentX = e.touches[0].clientX;
+  var currentY = e.touches[0].clientY;
+
+  var diffX = initialX - currentX;
+  var diffY = initialY - currentY;
+  if (Math.abs(diffX) > Math.abs(diffY)) {
+    if (diffX > 0) {
+      if(Object.keys(this.entityTabs).indexOf(Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)[0]) === 0){
+        this.setMessage('first element');
+      }
+      else{
+        this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)[0]].position--;
+        this._config[Object.keys(this.entityTabs)[Object.keys(this.entityTabs).indexOf(Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)[0])-1]].position++;
+        this.orderConfig(this._config);
+        this.orderEntityTabs();
+      }
+
+    } else {
+      if(Object.keys(this.entityTabs).indexOf(Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)[0]) === Object.keys(this.entityTabs).length-1){
+        this.setMessage('last element');
+      }
+      else{
+        this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)[0]].position++;
+        this._config[Object.keys(this.entityTabs)[Object.keys(this.entityTabs).indexOf(Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)[0])+1]].position--;
+        this.orderConfig(this._config);
+        this.orderEntityTabs();
+      }
+    }
+  }
+  initialX = null;
+  initialY = null;
+  chgConfig.detail = { config: this._config };
+  this.dispatchEvent(chgConfig);
+  this.requestUpdate();
+}
+
+
+changeCurrentEntity(caller) {
+  if (this.moveHint) {
+    this.setMessage('Swipe on selected entity tab to move it');
+    this.moveHint = false;
+  }
+  Object.keys(this.entityTabs).forEach(e => {
+    this.entityTabs[e] = false;
+  });
+  this.entityTabs[caller] = true;
+
+  chgConfig.detail = { config: this._config };
+  this.dispatchEvent(chgConfig);
+  this.requestUpdate();
+}
 
 
 updateIt(e, ha = this.hass) {
+
   if (e?.target.id === 'entity-selector' && e.target.value !== undefined && e.target.value !== null && e.target.value.length !== 0) {
-    this.newEnt = false;
+    if (this._config[e.target.value.substring(13)] === undefined) {
+
+      if (!this.newEnt && this._config?.[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)]?.entity !== undefined) {
+        this._config[e.target.value.substring(13)] = JSON.parse(JSON.stringify(this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)]));
+        delete this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)];
+        delete this.entityTabs[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)];
+      }
+
       this.entityTabs[e.target.value.substring(13)] = true;
       this._config[e.target.value.substring(13)] = {};
       this._config[e.target.value.substring(13)].entity = e.target.value;
-      this._config[e.target.value.substring(13)].display_name = this.hass.states[e.target.value].attributes.friendly_name.slice(0,10);
-
+      this._config[e.target.value.substring(13)].display_name = this.hass.states[e.target.value].attributes.friendly_name.slice(0, 10);
+      this.tmpName = this._config[e.target.value.substring(13)].display_name;
+      if (!this._config[e.target.value.substring(13)].hasOwnProperty('position'))
+        this._config[e.target.value.substring(13)].position = Object.keys(this._config).length - 1;
     }
-    if (this._config?.[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)]?.entity != undefined) {
+
+    this.newEnt = false;
+  }
+
+  if (this._config?.[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)]?.entity != undefined) {
+
       if(!this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)[0]].hasOwnProperty('display_name')){
         this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)[0]].display_name = this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)[0]].display_name.slice(0,10) || this.hass.states[this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)[0]]?.entity].attributes.friendly_name.slice(0,10);
       }
@@ -897,7 +1031,7 @@ updateIt(e, ha = this.hass) {
         channel_up: this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)].icons.channel_up === undefined ? 'mdi:arrow-up-bold-circle' : this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)].icons.channel_up,
         channel_down: this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)].icons.channel_down === undefined ? 'mdi:arrow-down-bold-circle' : this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)].icons.channel_down,
         source: this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)].icons.source === undefined ? 'mdi:logout-variant' : this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)].icons.source,
-        mute: this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)].icons.mute ? 'mdi:volume-variant-off' : this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)].icons.mute,
+        mute: this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)].icons.mute === undefined ? 'mdi:volume-variant-off' : this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)].icons.mute,
         volume_up: this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)].icons.volume_up === undefined ? 'mdi:volume-high' : this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)].icons.volume_up,
         volume_down: this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)].icons.volume_down === undefined ? 'mdi:volume-medium' : this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)].icons.volume_down
       };
@@ -1088,20 +1222,18 @@ updateIt(e, ha = this.hass) {
 
       if (e?.target.id === 'icon-selector') {
         if (Object.keys(this.tabs).filter(e => this.tabs[e] === true)[0] === 'settings') {
-          //this._config.icons['topicon'] = e?.target?.value === undefined ? this._config.icons['topicon'] : e?.target?.value;
           this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)].icons['topicon'] = e?.target?.value === undefined ? this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)].icons['topicon'] : e?.target?.value;
         }
         else {
-          console.log(this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)].icons[Object.keys(this.tabs).filter(e => this.tabs[e] === true)[0]]);
-          //this._config.icons[Object.keys(this.tabs).filter(e => this.tabs[e] === true)[0]] = e?.target?.value === undefined ? this._config.icons[Object.keys(this.tabs).filter(e => this.tabs[e] === true)[0]] : e?.target?.value;
           this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)].icons[Object.keys(this.tabs).filter(e => this.tabs[e] === true)[0]] = e?.target?.value === undefined ? this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)].icons[Object.keys(this.tabs).filter(e => this.tabs[e] === true)[0]] : e?.target?.value;
         }
       }
 
       if(e?.target.id === 'name'){
         this.tmpName = e?.target.value;
-        this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)[0]].display_name = e?.target.value === '' ? this.hass.states[this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)[0]].entity].attributes.friendly_name.length.slice(0,10) : e?.target.value;
+        this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)[0]].display_name = e?.target.value === '' ? this.hass.states[this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)[0]].entity].attributes.friendly_name.slice(0,10) : e?.target.value;
       }
+
       if(e?.target.id === 'fancy-borders-selector' )
         this._config[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)].fancy_borders = !this._config?.[Object.keys(this.entityTabs).filter(e => this.entityTabs[e] === true)].fancy_borders ;
     }
@@ -1211,11 +1343,6 @@ updateIt(e, ha = this.hass) {
       @keyframes fadeOut {
         0% { opacity: 1; }
         100% { opacity: 0; }
-      }
-
-      .move-remove ha-icon {
-        color: gray;
-        margin: 0 20px;
       }
 
       .hide{
